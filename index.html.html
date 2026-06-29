@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Cuaderno Agrario</title>
+<!-- iconos SVG inline - sin dependencias externas -->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-items:center}
+
+:root{
+  --arena:#F5F0E8;
+  --oliva:#2D5016;--oliva-lt:#E8F0DC;--oliva-bd:#7BA05B;--oliva-mid:#4A7A25;
+  --tierra:#8B6914;--tierra-lt:#F0E6CC;--tierra-bd:#D4B96A;
+  --tronco:#5C3D1E;--tronco-lt:#F2EBE1;
+  --ink:#1C1A14;--ink2:#4A4535;--ink3:#7A7260;
+  --cd:#FFFEF9;--sf:#F5F0E8;
+  --bd:rgba(92,61,30,0.15);--bs:rgba(92,61,30,0.3);
+  --rm:6px;--rl:10px;
+  --red:#8B2020;--red-lt:#FCEAEA;--red-bd:#D48080;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif
+}
+
+/* ── APP SHELL ── */
+#app{width:100%;max-width:900px;min-height:100vh;background:var(--arena);display:flex;flex-direction:column}
+
+/* ── SIDEBAR + MAIN layout ── */
+.layout{display:flex;flex:1;min-height:0}
+.sidebar{width:220px;background:var(--oliva);flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow-y:auto}
+
+/* ── SIDEBAR ── */
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.brand-icon{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.brand-icon i{font-size:20px;color:#C8E0A0}
+.sidebar-brand h1{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em;margin:0}
+.sidebar-brand p{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.sidebar-nav{padding:12px 8px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;font-size:13px;font-weight:500;color:rgba(255,255,255,.65) !important;cursor:pointer;transition:all .15s;margin-bottom:2px;border:none !important;background:transparent !important;width:100%;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.nav-item:hover{background:rgba(255,255,255,.1) !important;color:rgba(255,255,255,.9) !important}
+.nav-item.active{background:rgba(255,255,255,.18) !important;color:#fff !important;font-weight:700}
+.sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,.1)}
+.nav-cfg{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.5) !important;cursor:pointer;border:none !important;background:transparent !important;width:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.nav-cfg:hover{color:rgba(255,255,255,.8) !important}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--cd);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10}
+.topbar h2{font-size:16px;font-weight:700;color:var(--ink);flex:1;margin:0}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.pill-tierra{color:var(--tronco);background:var(--tierra-lt);border:1px solid var(--tierra-bd)}
+.pill-oliva{color:var(--oliva);background:var(--oliva-lt);border:1px solid var(--oliva-bd)}
+
+/* ── SCREENS ── */
+.content{padding:20px;flex:1}
+.screen{display:none}.screen.active{display:block}
+
+/* ── BLOCKS ── */
+.block{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 16px 8px;margin-bottom:14px}
+.block-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.block-head i{font-size:16px;color:var(--oliva-mid)}
+.block-head span{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em}
+
+/* ── FIELDS ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:4px;font-family:var(--font)}
+.field label i{font-size:13px}
+.field input,.field select,.field textarea{font-size:14px;color:var(--ink);background:var(--sf);border:1px solid var(--bd);border-radius:var(--rm);padding:10px 12px;width:100%;font-family:var(--font);-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--oliva-mid);background:var(--cd);box-shadow:0 0 0 3px rgba(74,122,37,.12)}
+.field textarea{height:80px;resize:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:520px){.row3{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr 1fr}}
+
+/* ── TIPO GRID ── */
+.tipo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:520px){.tipo-grid{grid-template-columns:repeat(2,1fr)}}
+.tipo-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;border:1px solid rgba(92,61,30,0.15) !important;border-radius:6px;background:#F5F0E8 !important;color:#4A4535 !important;font-size:12px;font-weight:600;cursor:pointer;width:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:all .15s;min-height:72px;-webkit-appearance:none}
+.tipo-btn span{font-size:12px;font-weight:600;color:inherit;line-height:1.2;text-align:center}
+.tipo-btn:hover{border-color:#7BA05B !important;background:#E8F0DC !important;color:#2D5016 !important}
+.tipo-btn.sel{background:#E8F0DC !important;border:2px solid #4A7A25 !important;color:#2D5016 !important}
+
+/* ── PERSONAS ── */
+.personas-block{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;margin-bottom:14px}
+.titular-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--oliva-lt);border:1px solid var(--oliva-bd);border-radius:var(--rm);margin-bottom:10px}
+.titular-row i{font-size:16px;color:var(--oliva-mid);flex-shrink:0}
+.titular-name{flex:1;font-size:13px;font-weight:700;color:var(--oliva)}
+.tag-titular{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oliva-mid);background:#fff;border:1px solid var(--oliva-bd);padding:2px 7px;border-radius:4px;margin-right:6px;white-space:nowrap}
+.h-wrap{display:flex;align-items:center;gap:5px}
+.h-wrap i{font-size:13px;color:var(--ink3)}
+.h-input{width:56px;font-size:13px;padding:6px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--cd);color:var(--ink);text-align:center;font-family:var(--font);-webkit-appearance:none}
+.op-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--sf);border-radius:var(--rm);margin-bottom:6px;border:1px solid var(--bd)}
+.op-name{flex:1;font-size:13px;color:var(--ink)}
+.add-op-row{display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap}
+.add-op-row select{flex:1;min-width:0;font-size:13px;padding:9px 10px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--sf);color:var(--ink);font-family:var(--font);-webkit-appearance:none}
+
+/* ── FITOSANITARIO ── */
+.fito{background:#F2F8EA;border:1px solid var(--oliva-bd);border-radius:var(--rl);padding:16px;margin-bottom:14px;display:none}
+.fito.show{display:block}
+.fito-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--oliva-bd)}
+.fito-head i{font-size:18px;color:var(--oliva)}
+.fito-head span{font-size:12px;font-weight:700;color:var(--oliva);text-transform:uppercase;letter-spacing:.07em}
+.fito .field input,.fito .field select{background:#fff}
+
+/* ── ADJUNTOS ── */
+.adj-block{border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-bottom:4px}
+.adj-tabs{display:flex;border-bottom:1px solid var(--bd);background:var(--sf)}
+.adj-tab{flex:1;padding:10px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#F5F0E8 !important;border:none !important;border-bottom:2px solid transparent !important;cursor:pointer;color:#7A7260 !important;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:all .15s}
+.adj-tab.active{color:#2D5016 !important;border-bottom-color:#2D5016 !important;background:#FFFEF9 !important}
+.adj-panel{padding:14px;display:none;background:var(--cd)}
+.adj-panel.active{display:block}
+.cam-btn{width:100%;padding:24px;border:1.5px dashed var(--bd);border-radius:var(--rm);background:var(--sf);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink3);transition:all .15s;font-family:var(--font)}
+.cam-btn:hover{border-color:var(--oliva-bd);background:var(--oliva-lt);color:var(--oliva)}
+.cam-btn i{font-size:28px}
+.cam-btn .cl{font-size:13px;font-weight:700;color:inherit}
+.cam-btn .cs{font-size:11px;color:var(--ink3)}
+.preview{display:none;margin-top:10px;border-radius:var(--rm);overflow:hidden;border:1px solid var(--bd)}
+.preview img{width:100%;display:block;max-height:200px;object-fit:cover}
+.preview-bar{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--sf);border-top:1px solid var(--bd)}
+.preview-name{flex:1;font-size:12px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── BOTONES — colores hex fijos, sin variables CSS ── */
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#2D5016 !important;color:#E8F0DC !important;border:1px solid #2D5016 !important;border-radius:10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;transition:all .15s}
+.btn-primary:hover{background:#4A7A25 !important;border-color:#4A7A25 !important}
+.btn-primary:active{opacity:.88}
+.btn-secondary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#FFFEF9 !important;color:#2D5016 !important;border:1px solid #7BA05B !important;border-radius:10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;transition:all .15s;margin-top:8px}
+.btn-secondary:hover{background:#E8F0DC !important;border-color:#4A7A25 !important}
+.btn-add{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;background:#2D5016 !important;color:#E8F0DC !important;border:1px solid #2D5016 !important;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;white-space:nowrap;-webkit-appearance:none;flex-shrink:0;transition:all .15s}
+.btn-add:hover{background:#4A7A25 !important;border-color:#4A7A25 !important}
+.btn-dashed{display:flex;align-items:center;gap:7px;padding:10px 20px;border:1.5px dashed rgba(92,61,30,0.25) !important;border-radius:10px;background:#FFFEF9 !important;color:#7A7260 !important;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:4px auto 16px;-webkit-appearance:none}
+.btn-dashed:hover{border-color:#7BA05B !important;color:#2D5016 !important;background:#E8F0DC !important}
+.btn-filter{width:40px;height:40px;border:1px solid rgba(92,61,30,0.2) !important;border-radius:6px;background:#FFFEF9 !important;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#7A7260 !important;flex-shrink:0;-webkit-appearance:none;transition:all .15s}
+.btn-filter.active{background:#E8F0DC !important;border-color:#7BA05B !important;color:#2D5016 !important}
+.btn-card-edit{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#FFFEF9 !important;border:1px solid rgba(92,61,30,0.2) !important;border-radius:4px;color:#639922 !important;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;white-space:nowrap;transition:all .15s}
+.btn-card-edit:hover{background:#E8F0DC !important;border-color:#7BA05B !important;color:#2D5016 !important}
+.btn-icon{background:#FFFEF9 !important;border:1px solid rgba(92,61,30,0.2) !important;cursor:pointer;color:#7A7260 !important;display:inline-flex;align-items:center;justify-content:center;padding:4px;border-radius:4px;-webkit-appearance:none;transition:all .15s;width:28px;height:28px;flex-shrink:0}
+.btn-icon:hover{background:#FCEAEA !important;border-color:#D48080 !important;color:#8B2020 !important}
+
+/* ── HISTORIAL chips ── */
+.search-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.search-wrap{flex:1;position:relative;display:flex;align-items:center}
+.search-wrap i{position:absolute;left:11px;font-size:16px;color:var(--ink3);pointer-events:none}
+.search-wrap input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--cd);color:var(--ink);font-size:14px;font-family:var(--font);-webkit-appearance:none}
+.search-wrap input:focus{outline:none;border-color:var(--oliva-mid)}
+.tipo-scroll{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;scrollbar-width:none}
+.tipo-scroll::-webkit-scrollbar{display:none}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid rgba(92,61,30,0.2) !important;border-radius:4px;background:#FFFEF9 !important;color:#4A4535 !important;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none}
+.chip:hover{border-color:#7BA05B !important;color:#2D5016 !important;background:#E8F0DC !important}
+.chip.sel{background:#E8F0DC !important;border-color:#4A7A25 !important;border-width:1.5px !important;color:#2D5016 !important}
+.chip.filtrado{background:#FCEAEA !important;border-color:#D48080 !important;color:#8B2020 !important}
+.filters-panel{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:12px;display:none}
+.filters-panel.open{display:block}
+.filters-panel select{font-size:13px;padding:9px 10px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--sf);color:var(--ink);font-family:var(--font);width:100%;-webkit-appearance:none}
+.filter-clear{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;margin-top:8px;padding:8px;background:#FFFEF9 !important;border:1px solid rgba(92,61,30,0.2) !important;border-radius:6px;color:#7A7260 !important;font-size:12px;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:all .15s}
+.filter-clear:hover{background:#F5F0E8 !important;color:#1C1A14 !important}
+
+/* ── ACT CARDS ── */
+.act-card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.act-card:hover{border-color:var(--oliva-bd)}
+.act-card.hidden{display:none}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.card-tipo-icon{width:40px;height:40px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-tipo-icon i{font-size:20px}
+.card-main{flex:1;min-width:0}
+.card-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-date{font-size:11px;font-weight:600;color:var(--ink3);display:flex;align-items:center;gap:3px}
+.card-date i{font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.badge i{font-size:11px}
+.b-oliva{background:var(--oliva-lt);color:var(--oliva);border:1px solid var(--oliva-bd)}
+.b-tierra{background:var(--tierra-lt);color:var(--tronco);border:1px solid var(--tierra-bd)}
+.b-gray{background:var(--sf);color:var(--ink2);border:1px solid var(--bd)}
+.b-red{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd)}
+.b-teal{background:#E1F5EE;color:#0F6E56;border:1px solid #7FCBB5}
+.card-desc{font-size:13px;color:var(--ink2);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--bd)}
+.card-people{font-size:11px;font-weight:600;color:var(--ink3);display:flex;align-items:center;gap:4px}
+.card-people i{font-size:13px}
+
+/* ── PARCELA BANNER ── */
+.parcela-banner{background:var(--oliva-lt);border:1.5px solid var(--oliva-bd);border-radius:var(--rl);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.parcela-banner i.bi{font-size:20px;color:var(--oliva);flex-shrink:0}
+.pb-info{flex:1;min-width:0}
+.pb-name{font-size:14px;font-weight:700;color:var(--oliva)}
+.pb-sub{font-size:11px;color:var(--oliva-mid);margin-top:1px}
+.pb-sup{font-size:18px;font-weight:700;color:var(--oliva);white-space:nowrap}
+.pb-sup span{font-size:11px;font-weight:600;color:var(--oliva-mid)}
+
+/* ── PARCELA CARDS ── */
+.parcela-card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.parcela-card:hover{border-color:var(--oliva-bd);background:var(--oliva-lt)}
+.pc-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.pc-icon{width:44px;height:44px;border-radius:var(--rm);background:var(--oliva-lt);border:1px solid var(--oliva-bd);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pc-icon i{font-size:22px;color:var(--oliva)}
+.parcela-card:hover .pc-icon{background:#C8E0A0}
+.pc-name{font-size:15px;font-weight:700;color:var(--ink)}
+.pc-sub{font-size:11px;font-weight:600;color:var(--ink3);margin-top:2px}
+.pc-sup{font-size:22px;font-weight:700;color:var(--oliva);white-space:nowrap}
+.pc-sup span{font-size:11px;font-weight:600;color:var(--ink3)}
+.pc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:4px}
+.tag i{font-size:12px}
+.t-oliva{background:var(--oliva-lt);color:var(--oliva);border:1px solid var(--oliva-bd)}
+.t-tierra{background:var(--tierra-lt);color:var(--tronco);border:1px solid var(--tierra-bd)}
+.t-gray{background:var(--sf);color:var(--ink2);border:1px solid var(--bd)}
+.t-blue{background:#E6F1FB;color:#185FA5;border:1px solid #B5D4F4}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--bd)}
+.pc-acts{font-size:11px;font-weight:600;color:var(--ink3);display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.04em}
+.pc-acts i{font-size:13px}
+.pc-link{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--oliva-mid);display:flex;align-items:center;gap:4px}
+.pc-link i{font-size:14px}
+
+/* ── FORM PARCELA ── */
+.form-card{background:var(--cd);border:1.5px solid var(--oliva-bd);border-radius:var(--rl);padding:18px;margin-bottom:14px;display:none}
+.form-card.open{display:block}
+.form-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.form-head i{font-size:17px;color:var(--oliva-mid)}
+.form-head span{font-size:13px;font-weight:700;color:var(--ink);flex:1;text-transform:uppercase;letter-spacing:.04em}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:400px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rl);padding:14px}
+.stat-n{font-size:28px;font-weight:700;color:var(--oliva);line-height:1}
+.stat-l{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-top:5px}
+
+/* ── CONFIG inline rows ── */
+.info-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd)}
+.info-row:last-child{border-bottom:none}
+.info-row i.ir{font-size:17px;color:var(--ink3);flex-shrink:0;width:20px;text-align:center}
+.info-row .il{font-size:13px;color:var(--ink2);flex:1}
+.info-row .iv{font-size:13px;font-weight:700;color:var(--ink)}
+.info-row .iv.ok{color:#0F6E56}
+.op-pill-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.op-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:12px;font-weight:600;color:var(--ink2)}
+
+/* ── EDITAR BANNER ── */
+.edit-banner{display:none;align-items:center;gap:8px;background:var(--tierra-lt);border:1px solid var(--tierra-bd);border-radius:var(--rl);padding:10px 14px;margin-bottom:12px}
+.edit-banner.show{display:flex}
+.edit-banner i{color:var(--tierra);font-size:16px;flex-shrink:0}
+.edit-banner span{font-size:12px;color:var(--tronco);flex:1;font-weight:600}
+.edit-banner button{background:none;border:none;cursor:pointer;color:var(--tierra);font-size:12px;font-weight:700;font-family:var(--font);text-transform:uppercase;letter-spacing:.04em}
+
+/* ── EMPTY / LOADING ── */
+.empty{text-align:center;padding:48px 20px;color:var(--ink3)}
+.empty i{font-size:40px;display:block;margin-bottom:10px;color:var(--bd)}
+.empty p{font-size:14px;font-weight:500}
+.loading{text-align:center;padding:48px 20px;color:var(--ink3);font-size:14px}
+.loading i{font-size:24px;display:block;margin-bottom:8px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--tronco);color:#F5F0E8;padding:11px 22px;border-radius:6px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px;transition:transform .25s;pointer-events:none;z-index:100;white-space:nowrap;--tronco:#5C3D1E}
+.toast{background:#5C3D1E}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+.toast i{font-size:16px;color:#E8F0DC}
+
+/* ── BOTTOM NAV (móvil) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--cd);border-top:1px solid var(--bd);padding:6px 8px 10px;z-index:20}
+.bottom-nav button{flex:1;padding:8px 4px;border:none !important;background:#FFFEF9 !important;border-radius:6px;font-size:11px;font-weight:600;color:#7A7260 !important;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:.04em;transition:all .15s}
+.bottom-nav button.active{background:#E8F0DC !important;color:#2D5016 !important}
+
+@media(max-width:640px){
+  .sidebar{display:none}
+  .bottom-nav{display:flex}
+  .content{padding:16px;padding-bottom:90px}
+  .topbar{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10M12 9v12M12 9C12 9 8 7 6 3c3 0 5.5 1.5 6 6zM12 9c0 0 4-2 6-6-3 0-5.5 1.5-6 6z"/></svg></div>
+        <h1 id="sb-nombre">Cuaderno Agrario</h1>
+        <p id="sb-finca">—</p>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-item active" id="nav-nueva" onclick="goTo('nueva',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva actuación</button>
+        <button class="nav-item" id="nav-historial" onclick="goTo('historial',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>Historial</button>
+        <button class="nav-item" id="nav-parcelas" onclick="goTo('parcelas',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20"/><line x1="9" y1="4" x2="9" y2="17"/><line x1="15" y1="7" x2="15" y2="20"/></svg>Parcelas</button>
+        <button class="nav-item" id="nav-jornales" onclick="goTo('jornales',this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Jornales</button>
+      </div>
+      <div class="sidebar-footer">
+        <button class="nav-cfg" onclick="goTo('config',document.getElementById('nav-nueva'))"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configuración</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <h2 id="topbar-h">Nueva actuación</h2>
+        <span class="pill pill-tierra" id="topbar-camp">Campaña 2026</span>
+        <span class="pill pill-oliva" id="topbar-count" style="display:none"></span>
+      </div>
+
+      <div class="content">
+
+        <!-- ══ NUEVA ACTUACIÓN ══ -->
+        <div id="s-nueva" class="screen active">
+          <div class="edit-banner" id="edit-banner">
+            <svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Editando actuación existente</span>
+            <button onclick="cancelarEdicion()">Cancelar</button>
+          </div>
+
+          <div class="block">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Dónde y cuándo</span></div>
+            <div class="row2">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Fecha</label><input type="date" id="f-fecha"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20"/><line x1="9" y1="4" x2="9" y2="17"/><line x1="15" y1="7" x2="15" y2="20"/></svg>Parcela</label>
+                <select id="f-parcela"><option value="">Elegir parcela…</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5l1.5 1.5 2.5-2.5"/><path d="M3.5 11.5l1.5 1.5 2.5-2.5"/><path d="M3.5 17.5l1.5 1.5 2.5-2.5"/><line x1="11" y1="6" x2="20" y2="6"/><line x1="11" y1="12" x2="20" y2="12"/><line x1="11" y1="18" x2="20" y2="18"/></svg><span>Tipo de actuación</span></div>
+            <div class="tipo-grid">
+              <button class="tipo-btn" data-tipo="Poda"          onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg><span>Poda</span></button>
+              <button class="tipo-btn" data-tipo="Desbroce"      onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8l2-4M19 8l-2-4M9 8l-1 4M15 8l1 4M10 12l2 8M14 12l-2 8"/></svg><span>Desbroce</span></button>
+              <button class="tipo-btn" data-tipo="Laboreo"       onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="2"/><path d="M5 17V9l4-5h6l2 4v9"/><path d="M9 4v8h10"/></svg><span>Laboreo</span></button>
+              <button class="tipo-btn" data-tipo="Abonado"       onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 9.5 6 14a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><line x1="6" y1="14" x2="18" y2="14"/></svg><span>Abonado</span></button>
+              <button class="tipo-btn" data-tipo="Fitosanitario" onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4v4H3z"/><path d="M7 5h3"/><path d="M10 3v4"/><path d="M10 5c3 0 5 2 5 5v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-9c0-3 2-5 4-5z"/><line x1="14" y1="9" x2="16" y2="7"/><line x1="14" y1="7" x2="16" y2="9"/><line x1="17" y1="6" x2="19" y2="4"/><line x1="17" y1="4" x2="19" y2="6"/></svg><span>Fitosanitario</span></button>
+              <button class="tipo-btn" data-tipo="Recolección"   onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg><span>Recolección</span></button>
+              <button class="tipo-btn" data-tipo="Incidencia"    onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Incidencia</span></button>
+              <button class="tipo-btn" data-tipo="Observación"   onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>Observación</span></button>
+            </div>
+            <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>Descripción</label><textarea id="f-desc" placeholder="Qué se hizo, cómo quedó…"></textarea></div>
+          </div>
+
+          <div class="fito" id="fito-block">
+            <div class="fito-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4v4H3z"/><path d="M7 5h3"/><path d="M10 3v4"/><path d="M10 5c3 0 5 2 5 5v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-9c0-3 2-5 4-5z"/><line x1="14" y1="9" x2="16" y2="7"/><line x1="14" y1="7" x2="16" y2="9"/><line x1="17" y1="6" x2="19" y2="4"/><line x1="17" y1="4" x2="19" y2="6"/></svg><span>Datos fitosanitarios</span></div>
+            <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9V5a3 3 0 0 1 6 0v4"/><path d="M9 9a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3H9z"/><line x1="3" y1="11" x2="6" y2="11"/><line x1="18" y1="11" x2="21" y2="11"/><line x1="3" y1="16" x2="6" y2="16"/><line x1="18" y1="16" x2="21" y2="16"/><line x1="9" y1="20" x2="9" y2="21"/><line x1="15" y1="20" x2="15" y2="21"/></svg>Problema detectado</label><input type="text" id="fito-problema" placeholder="Ej. repilo, verticilosis, mosca…"></div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M9 3v7.5L4 19a1 1 0 0 0 .9 1.5h14.2A1 1 0 0 0 20 19l-5-8.5V3"/><line x1="6.5" y1="13" x2="17.5" y2="13"/></svg>Producto</label><input type="text" id="fito-producto" placeholder="Nombre comercial"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 9h4M14 15h4"/></svg>Nº registro</label><input type="text" id="fito-registro" placeholder="ES-…"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>Materia activa</label><input type="text" id="fito-materia" placeholder="Cobre, azufre…"></div>
+            </div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M3 21L21 3"/><line x1="9" y1="3" x2="9" y2="6"/><line x1="15" y1="18" x2="15" y2="21"/><line x1="3" y1="9" x2="6" y2="9"/><line x1="18" y1="15" x2="21" y2="15"/></svg>Dosis</label><input type="text" id="fito-dosis" placeholder="0.3 kg/hl"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Sup. tratada (ha)</label><input type="number" id="fito-sup" placeholder="0.0" step="0.1"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Equipo</label><input type="text" id="fito-equipo" placeholder="Mochila, atomizador…"></div>
+            </div>
+          </div>
+
+          <div class="personas-block">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Personas en la actuación</span></div>
+            <div class="titular-row">
+              <svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
+              <span class="titular-name" id="titular-nombre">Titular</span>
+              <span class="tag-titular">titular</span>
+              <div class="h-wrap"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><input type="number" class="h-input" id="titular-h" placeholder="h." min="0" step="0.5"></div>
+            </div>
+            <div id="op-lista"></div>
+            <div class="add-op-row">
+              <select id="op-sel"><option value="">Añadir operario…</option></select>
+              <input type="number" class="h-input" id="op-h" placeholder="h." min="0" step="0.5">
+              <button class="btn-add" onclick="addOp()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir</button>
+            </div>
+          </div>
+
+          <div class="block" style="padding-bottom:16px">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><span>Notas y adjunto</span></div>
+            <div class="field" style="margin-bottom:14px"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Observaciones</label><textarea id="f-obs" placeholder="Comentarios adicionales…"></textarea></div>
+            <div class="adj-block">
+              <div class="adj-tabs">
+                <button class="adj-tab active" onclick="adjTab('cam',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Cámara</button>
+                <button class="adj-tab" onclick="adjTab('gal',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Galería</button>
+                <button class="adj-tab" onclick="adjTab('enl',this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Enlace</button>
+              </div>
+              <div class="adj-panel active" id="ap-cam">
+                <button class="cam-btn" onclick="document.getElementById('inp-cam').click()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="cl">Hacer foto ahora</span><span class="cs">Abre la cámara trasera</span></button>
+                <input type="file" id="inp-cam" accept="image/*" capture="environment" style="display:none" onchange="previewFile(this,'prev-cam')">
+                <div class="preview" id="prev-cam"><img id="prev-cam-img" src="" alt="Foto"><div class="preview-bar"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)"" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span class="preview-name" id="prev-cam-name"></span><button class="btn-icon" onclick="clearPreview('prev-cam','inp-cam')"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>
+              </div>
+              <div class="adj-panel" id="ap-gal">
+                <button class="cam-btn" onclick="document.getElementById('inp-gal').click()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span class="cl">Elegir foto o archivo</span><span class="cs">Galería, PDF, documentos…</span></button>
+                <input type="file" id="inp-gal" accept="image/*,application/pdf" style="display:none" onchange="previewFile(this,'prev-gal')">
+                <div class="preview" id="prev-gal"><img id="prev-gal-img" src="" alt="Archivo"><div class="preview-bar"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)"" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span class="preview-name" id="prev-gal-name"></span><button class="btn-icon" onclick="clearPreview('prev-gal','inp-gal')"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>
+              </div>
+              <div class="adj-panel" id="ap-enl">
+                <div class="field" style="margin:0"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Enlace externo</label><input type="url" id="f-enlace" placeholder="https://drive.google.com/…"></div>
+              </div>
+            </div>
+          </div>
+          <button class="btn-primary" id="btn-guardar" onclick="guardarActuacion()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar actuación</button>
+        </div>
+
+        <!-- ══ HISTORIAL ══ -->
+        <div id="s-historial" class="screen">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-n" id="stat-acts">—</div><div class="stat-l">Actuaciones año</div></div>
+            <div class="stat-card"><div class="stat-n" id="stat-parc">—</div><div class="stat-l">Parcelas activas</div></div>
+            <div class="stat-card"><div class="stat-n" id="stat-ha">—</div><div class="stat-l">Hectáreas totales</div></div>
+          </div>
+          <div id="parcela-banner" style="display:none">
+            <div class="parcela-banner">
+              <svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 7H8z"/><path d="M10 10l4 7H6z"/><path d="M8 17l4 7H4z"/><line x1="12" y1="3" x2="12" y2="24"/></svg>
+              <div class="pb-info"><div class="pb-name" id="b-name"></div><div class="pb-sub" id="b-sub"></div></div>
+              <div class="pb-sup" id="b-sup"></div>
+            </div>
+          </div>
+          <div class="search-row">
+            <div class="search-wrap"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="h-search" placeholder="Buscar actuación…" oninput="renderHistorial()"></div>
+            <button class="btn-filter" id="h-fbtn" onclick="toggleHF()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg></button>
+          </div>
+          <div class="filters-panel" id="h-filters">
+            <div class="row2" style="margin-bottom:0">
+              <select id="h-parc" onchange="renderHistorial()"><option value="">Todas las parcelas</option></select>
+              <select id="h-camp" onchange="renderHistorial()"><option value="">Todas las campañas</option></select>
+            </div>
+            <button class="filter-clear" onclick="clearHF()"><svg width="13px" height="13px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Limpiar filtros</button>
+          </div>
+          <div class="tipo-scroll">
+            <button class="chip sel todas-chip" data-tipo="" onclick="selChip(this,true)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Todas</button>
+            <button class="chip" data-tipo="Poda" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>Poda</button>
+            <button class="chip" data-tipo="Desbroce" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8l2-4M19 8l-2-4M9 8l-1 4M15 8l1 4M10 12l2 8M14 12l-2 8"/></svg>Desbroce</button>
+            <button class="chip" data-tipo="Laboreo" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="2"/><path d="M5 17V9l4-5h6l2 4v9"/><path d="M9 4v8h10"/></svg>Laboreo</button>
+            <button class="chip" data-tipo="Abonado" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 9.5 6 14a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><line x1="6" y1="14" x2="18" y2="14"/></svg>Abonado</button>
+            <button class="chip" data-tipo="Fitosanitario" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4v4H3z"/><path d="M7 5h3"/><path d="M10 3v4"/><path d="M10 5c3 0 5 2 5 5v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-9c0-3 2-5 4-5z"/><line x1="14" y1="9" x2="16" y2="7"/><line x1="14" y1="7" x2="16" y2="9"/><line x1="17" y1="6" x2="19" y2="4"/><line x1="17" y1="4" x2="19" y2="6"/></svg>Fitosanitario</button>
+            <button class="chip" data-tipo="Recolección" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg>Recolección</button>
+            <button class="chip" data-tipo="Incidencia" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidencia</button>
+            <button class="chip" data-tipo="Observación" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Observación</button>
+          </div>
+          <div id="h-lista"><div class="loading"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Cargando actuaciones…</div></div>
+        </div>
+
+        <!-- ══ PARCELAS ══ -->
+        <div id="s-parcelas" class="screen">
+          <div id="p-lista"><div class="loading"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Cargando parcelas…</div></div>
+          <div style="display:flex;justify-content:center">
+            <button class="btn-dashed" id="p-add-toggle" onclick="togglePF()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir parcela</button>
+          </div>
+          <div class="form-card" id="p-form">
+            <div class="form-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Nueva parcela</span><button class="btn-icon" onclick="togglePF()"><svg width="18px" height="18px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div class="row2">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Nombre</label><input type="text" id="np-n" placeholder="Ej. El Cerrado"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 14-4 4L1 7z"/><line x1="9" y1="9" x2="7" y2="11"/><line x1="12" y1="12" x2="10" y2="14"/><line x1="15" y1="15" x2="13" y2="17"/></svg>Superficie (ha)</label><input type="number" id="np-s" placeholder="0.0" step="0.1" min="0"></div>
+            </div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10M12 9v12M12 9C12 9 8 7 6 3c3 0 5.5 1.5 6 6zM12 9c0 0 4-2 6-6-3 0-5.5 1.5-6 6z"/></svg>Cultivo</label><input type="text" id="np-c" value="Olivar"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.34"/><path d="M17 8c1 2.4.5 5-1 7-2 2.67-5 4-8 4-1 0-2-.17-3-.5"/><path d="M17 8c2-1.33 3.33-3 4-5-3 0-5.67 1.33-8 4"/></svg>Variedad</label><input type="text" id="np-v" placeholder="Picual…"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Régimen</label><select id="np-r"><option>Secano</option><option>Regadío</option></select></div>
+            </div>
+            <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Ref. SIGPAC</label><input type="text" id="np-sig" placeholder="Polígono · Parcela"></div>
+            <button class="btn-primary" style="padding:12px;font-size:13px" onclick="guardarParcela()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Guardar parcela</button>
+          </div>
+        </div>
+
+
+        <!-- ══ JORNALES ══ -->
+        <div id="s-jornales" class="screen">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <div style="display:flex;background:#F5F0E8;border:1px solid rgba(92,61,30,0.2);border-radius:6px;overflow:hidden;flex-shrink:0">
+              <button id="jt-anual" onclick="setJModo('anual',this)" style="padding:8px 16px;background:#2D5016 !important;color:#E8F0DC !important;border:none !important;border-right:1px solid rgba(92,61,30,0.15);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:all .15s">Anual</button>
+              <button id="jt-mensual" onclick="setJModo('mensual',this)" style="padding:8px 16px;background:#FFFEF9 !important;color:#7A7260 !important;border:none !important;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:all .15s">Mensual</button>
+            </div>
+            <select id="j-año" onchange="renderJornales()" style="font-size:13px;padding:8px 12px;border:1px solid rgba(92,61,30,0.2);border-radius:6px;background:#FFFEF9;color:#1C1A14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;cursor:pointer"></select>
+            <select id="j-mes" onchange="renderJornales()" style="display:none;font-size:13px;padding:8px 12px;border:1px solid rgba(92,61,30,0.2);border-radius:6px;background:#FFFEF9;color:#1C1A14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;cursor:pointer">
+              <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </div>
+
+          <!-- total card -->
+          <div style="background:#2D5016;border-radius:10px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.07em" id="j-total-label">Total 2026</div>
+              <div style="font-size:32px;font-weight:700;color:#fff;line-height:1.1;margin-top:2px" id="j-total-h">0 h</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px" id="j-total-sub">0 actuaciones · 0 personas</div>
+            </div>
+            <div style="display:flex;gap:16px">
+              <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#C8E0A0" id="j-ts-acts">0</div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">Actu.</div></div>
+              <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#C8E0A0" id="j-ts-ops">0</div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">Pers.</div></div>
+              <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#C8E0A0" id="j-ts-parc">0</div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">Parc.</div></div>
+            </div>
+          </div>
+
+          <div id="j-op-lista"></div>
+
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+            <button class="btn-primary" style="width:auto;padding:11px 18px;font-size:12px" onclick="exportJornalesCSV()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exportar CSV
+            </button>
+            <button class="btn-secondary" style="width:auto;padding:10px 18px;font-size:12px;margin-top:0" onclick="window.print()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Imprimir parte
+            </button>
+          </div>
+        </div>
+
+        <!-- ══ CONFIGURACIÓN ══ -->
+        <div id="s-config" class="screen">
+          <div class="block">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Datos de la explotación</span></div>
+            <div class="row2">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Nombre</label><input type="text" id="cfg-nombre" placeholder="Finca Las Oliveras"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Titular</label><input type="text" id="cfg-titular" placeholder="Nombre completo"></div>
+            </div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 9h4M14 15h4"/></svg>NIF</label><input type="text" id="cfg-nif" placeholder="Opcional"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Campaña</label><input type="text" id="cfg-campana" placeholder="2026"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Teléfono</label><input type="text" id="cfg-tel" placeholder="Opcional"></div>
+            </div>
+          </div>
+          <div class="personas-block">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Operarios habituales</span></div>
+            <div class="op-pill-wrap" id="cfg-op-pills"></div>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="cfg-op-input" placeholder="Nombre o empresa…" style="flex:1;font-size:13px;padding:9px 12px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--sf);color:var(--ink);font-family:var(--font);-webkit-appearance:none">
+              <button class="btn-add" onclick="addCfgOp()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir</button>
+            </div>
+          </div>
+          <div class="block" style="padding-bottom:14px">
+            <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg><span>Base de datos (Supabase)</span></div>
+            <div class="info-row"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="#0F6E56"" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><span class="il">Estado conexión</span><span class="iv ok" id="cfg-db-estado">Verificando…</span></div>
+            <div class="info-row" style="cursor:pointer" onclick="pingManual()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span class="il">Enviar ping manual</span><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)"" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+          <button class="btn-primary" onclick="guardarCfg()"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Guardar configuración</button>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /layout -->
+
+  <!-- BOTTOM NAV (móvil) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="active" id="bnav-nueva" onclick="goTo('nueva',this);syncBnav('nueva')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva</button>
+    <button id="bnav-historial" onclick="goTo('historial',this);syncBnav('historial')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>Historial</button>
+    <button id="bnav-parcelas" onclick="goTo('parcelas',this);syncBnav('parcelas')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 7 9 4 15 7 21 4 21 17 15 20 9 17 3 20"/><line x1="9" y1="4" x2="9" y2="17"/><line x1="15" y1="7" x2="15" y2="20"/></svg>Parcelas</button>
+    
+    <button id="bnav-jornales" onclick="goTo('jornales',this);syncBnav('jornales')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Jornales</button>
+    <button id="bnav-config" onclick="goTo('config',this);syncBnav('config')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Config</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg">Guardado</span></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIGURACIÓN SUPABASE
+// ══════════════════════════════════════════════
+const SUPABASE_URL = 'https://mmzbgdbbznqhqtramdoo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Sxh_RIiEU29O3hVG-r7xgg_LBl3gd45';
+
+// ══════════════════════════════════════════════
+//  API
+// ══════════════════════════════════════════════
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.message || `Error ${res.status}`); }
+  const t = await res.text();
+  return t ? JSON.parse(t) : [];
+}
+const db = {
+  get:    (t, q='')    => sbFetch(`${t}?${q}&order=created_at.desc`),
+  insert: (t, b)       => sbFetch(t, {method:'POST', body:JSON.stringify(b)}),
+  update: (t, id, b)   => sbFetch(`${t}?actuacion_id=eq.${id}`, {method:'PATCH', body:JSON.stringify(b)}),
+  updParcela:(t,id,b)  => sbFetch(`${t}?parcela_id=eq.${id}`,   {method:'PATCH', body:JSON.stringify(b)}),
+  ping:   ()           => sbFetch('actuaciones?limit=1')
+};
+
+// ══════════════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════════════
+let CFG = JSON.parse(localStorage.getItem('cfg') || '{"nombre":"","titular":"","campana":"2026","operarios":[]}');
+let PARCELAS = [], ACTUACIONES = [];
+let tipoSel = '', parcelaFiltro = '', editandoId = null;
+
+const SVG_ICONS = {
+  'ti-cut': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
+  'ti-rake': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8l2-4M19 8l-2-4M9 8l-1 4M15 8l1 4M10 12l2 8M14 12l-2 8"/></svg>`,
+  'ti-tractor': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="2"/><path d="M5 17V9l4-5h6l2 4v9"/><path d="M9 4v8h10"/></svg>`,
+  'ti-droplet-half-2': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 9.5 6 14a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><line x1="6" y1="14" x2="18" y2="14"/></svg>`,
+  'ti-spray': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4v4H3z"/><path d="M7 5h3"/><path d="M10 3v4"/><path d="M10 5c3 0 5 2 5 5v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-9c0-3 2-5 4-5z"/><line x1="14" y1="9" x2="16" y2="7"/><line x1="14" y1="7" x2="16" y2="9"/><line x1="17" y1="6" x2="19" y2="4"/><line x1="17" y1="4" x2="19" y2="6"/></svg>`,
+  'ti-basket': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg>`,
+  'ti-alert-triangle': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  'ti-eye': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  'ti-notes': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>`,
+  'ti-users': `<svg width="13px" height="13px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  'ti-user': `<svg width="13px" height="13px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+};
+function getIcon(name, color='currentColor', size='20px') {
+  const svg = SVG_ICONS[name] || '';
+  if (!svg) return '';
+  return svg.replace(/stroke="currentColor"/g, `stroke="${color}"`).replace(/width="[^"]*"/g, `width="${size}"`).replace(/height="[^"]*"/g, `height="${size}"`);
+}
+
+const TIPO_STYLE = {
+  'Poda':          {bg:var_tierra_lt(), bc:var_tierra_bd(), ic:'#5C3D1E', icon:'ti-cut'},
+  'Desbroce':      {bg:'#F2EBE1',       bc:'#C4A882',       ic:'#5C3D1E', icon:'ti-rake'},
+  'Laboreo':       {bg:'#F2EBE1',       bc:'#C4A882',       ic:'#5C3D1E', icon:'ti-tractor'},
+  'Abonado':       {bg:'#E1F5EE',       bc:'#7FCBB5',       ic:'#0F6E56', icon:'ti-droplet-half-2'},
+  'Fitosanitario': {bg:'#E8F0DC',       bc:'#7BA05B',       ic:'#2D5016', icon:'ti-spray'},
+  'Recolección':   {bg:'#E6F1FB',       bc:'#B5D4F4',       ic:'#185FA5', icon:'ti-basket'},
+  'Incidencia':    {bg:'#FCEAEA',       bc:'#D48080',       ic:'#8B2020', icon:'ti-alert-triangle'},
+  'Observación':   {bg:'#F2EBE1',       bc:'#C4A882',       ic:'#5C3D1E', icon:'ti-eye'},
+};
+const TIPO_BADGE = {
+  'Poda':'b-tierra','Desbroce':'b-gray','Laboreo':'b-gray','Abonado':'b-teal',
+  'Fitosanitario':'b-oliva','Recolección':'b-blue','Incidencia':'b-red','Observación':'b-gray'
+};
+function var_tierra_lt(){return '#F0E6CC';}
+function var_tierra_bd(){return '#D4B96A';}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  aplicarCfg();
+  await Promise.all([cargarParcelas(), cargarActuaciones()]);
+  verificarConexion();
+  cargarCfgForm();
+});
+
+function aplicarCfg() {
+  document.getElementById('topbar-camp').textContent = 'Campaña ' + (CFG.campana || '2026');
+  document.getElementById('titular-nombre').textContent = CFG.titular || 'Titular';
+  document.getElementById('sb-finca').textContent = CFG.nombre || '—';
+}
+
+// ══════════════════════════════════════════════
+//  PARCELAS
+// ══════════════════════════════════════════════
+async function cargarParcelas() {
+  try {
+    PARCELAS = await db.get('parcelas', 'activa=eq.true');
+    renderParcelas();
+    poblarSelectParcelas();
+    actualizarStats();
+  } catch(e) {
+    document.getElementById('p-lista').innerHTML = `<div class="empty"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a16 16 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg><p>Sin conexión. Comprueba URL y clave Supabase.</p></div>`;
+    showToast('Error al cargar parcelas', true);
+  }
+}
+
+function renderParcelas() {
+  const lista = document.getElementById('p-lista');
+  if (!PARCELAS.length) {
+    lista.innerHTML = `<div class="empty"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 4.5V4L3 7v13l6-3 4.5 2.25M15 4l6 3v4.5"/><path d="M15 4v3.5"/></svg><p>Aún no hay parcelas. Añade la primera.</p></div>`;
+    return;
+  }
+  lista.innerHTML = PARCELAS.map(p => {
+    const acts = ACTUACIONES.filter(a => a.parcela_id === p.parcela_id).length;
+    const regTag = p.secano_regadio === 'Regadío'
+      ? `<span class="tag t-blue"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Regadío</span>`
+      : `<span class="tag t-tierra"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Secano</span>`;
+    const varTag = p.variedad ? `<span class="tag t-oliva"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.34"/><path d="M17 8c1 2.4.5 5-1 7-2 2.67-5 4-8 4-1 0-2-.17-3-.5"/><path d="M17 8c2-1.33 3.33-3 4-5-3 0-5.67 1.33-8 4"/></svg>${p.variedad}</span>` : '';
+    return `<div class="parcela-card" onclick="irAParcela('${p.parcela_id}','${p.nombre_parcela}','${p.cultivo}${p.variedad?' · '+p.variedad:''}${p.secano_regadio?' · '+p.secano_regadio:''}','${p.superficie_ha}')">
+      <div class="pc-top"><div class="pc-icon"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 7H8z"/><path d="M10 10l4 7H6z"/><path d="M8 17l4 7H4z"/><line x1="12" y1="3" x2="12" y2="24"/></svg></div><div style="flex:1;min-width:0"><div class="pc-name">${p.nombre_parcela}</div><div class="pc-sub">${p.ref_sigpac||'Sin ref. SIGPAC'}</div></div><div class="pc-sup">${p.superficie_ha} <span>ha</span></div></div>
+      <div class="pc-tags"><span class="tag t-oliva"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10M12 9v12M12 9C12 9 8 7 6 3c3 0 5.5 1.5 6 6zM12 9c0 0 4-2 6-6-3 0-5.5 1.5-6 6z"/></svg>${p.cultivo}</span>${varTag}${regTag}</div>
+      <div class="pc-footer"><span class="pc-acts"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 22l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"/></svg>${acts} actuación${acts!==1?'es':''}</span><span class="pc-link"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Ver actuaciones</span></div>
+    </div>`;
+  }).join('');
+}
+
+function poblarSelectParcelas() {
+  const opts = PARCELAS.map(p => `<option value="${p.parcela_id}">${p.nombre_parcela} · ${p.superficie_ha} ha</option>`).join('');
+  document.getElementById('f-parcela').innerHTML = '<option value="">Elegir parcela…</option>' + opts;
+  document.getElementById('h-parc').innerHTML = '<option value="">Todas las parcelas</option>' + PARCELAS.map(p=>`<option value="${p.parcela_id}">${p.nombre_parcela}</option>`).join('');
+}
+
+function actualizarStats() {
+  const camp = CFG.campana || new Date().getFullYear().toString();
+  document.getElementById('stat-acts').textContent = ACTUACIONES.filter(a=>a.fecha?.startsWith(camp)).length;
+  document.getElementById('stat-parc').textContent = PARCELAS.length;
+  document.getElementById('stat-ha').textContent   = PARCELAS.reduce((s,p)=>s+parseFloat(p.superficie_ha||0),0).toFixed(1);
+}
+
+async function guardarParcela() {
+  const nombre = document.getElementById('np-n').value.trim();
+  const sup    = document.getElementById('np-s').value;
+  if (!nombre||!sup) { showToast('Indica nombre y superficie', true); return; }
+  const payload = {
+    parcela_id:     crypto.randomUUID(),
+    nombre_parcela: nombre,
+    superficie_ha:  parseFloat(sup),
+    cultivo:        document.getElementById('np-c').value||'Olivar',
+    variedad:       document.getElementById('np-v').value||null,
+    secano_regadio: document.getElementById('np-r').value,
+    ref_sigpac:     document.getElementById('np-sig').value||null,
+    activa:         true
+  };
+  try {
+    await db.insert('parcelas', payload);
+    showToast(`Parcela "${nombre}" guardada`);
+    ['np-n','np-s','np-v','np-sig'].forEach(id=>document.getElementById(id).value='');
+    togglePF();
+    await cargarParcelas();
+  } catch(e) { showToast('Error al guardar parcela', true); }
+}
+
+// ══════════════════════════════════════════════
+//  ACTUACIONES
+// ══════════════════════════════════════════════
+async function cargarActuaciones() {
+  try {
+    ACTUACIONES = await db.get('actuaciones');
+    renderHistorial();
+    poblarCampanas();
+    actualizarStats();
+  } catch(e) {
+    document.getElementById('h-lista').innerHTML = `<div class="empty"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a16 16 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg><p>No se pudieron cargar las actuaciones.</p></div>`;
+  }
+}
+
+function poblarCampanas() {
+  const años = [...new Set(ACTUACIONES.map(a=>a.fecha?.slice(0,4)).filter(Boolean))].sort().reverse();
+  document.getElementById('h-camp').innerHTML = '<option value="">Todas las campañas</option>' + años.map(y=>`<option value="${y}">${y}</option>`).join('');
+}
+
+function renderHistorial() {
+  const search  = document.getElementById('h-search').value.toLowerCase();
+  const parcela = document.getElementById('h-parc').value || parcelaFiltro;
+  const camp    = document.getElementById('h-camp').value;
+  const filtros = ACTUACIONES.filter(a => {
+    return (!tipoSel   || a.tipo_actuacion===tipoSel)
+        && (!parcela   || a.parcela_id===parcela)
+        && (!camp      || a.fecha?.startsWith(camp))
+        && (!search    || (a.descripcion||'').toLowerCase().includes(search)
+                       || (a.tipo_actuacion||'').toLowerCase().includes(search)
+                       || (a.operario||'').toLowerCase().includes(search));
+  });
+
+  const count = document.getElementById('topbar-count');
+  count.textContent = `${filtros.length} actuación${filtros.length!==1?'es':''}`;
+
+  if (!filtros.length) {
+    document.getElementById('h-lista').innerHTML = `<div class="empty"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><p>No hay actuaciones con ese filtro</p></div>`;
+    return;
+  }
+
+  document.getElementById('h-lista').innerHTML = filtros.map(a => {
+    const est = TIPO_STYLE[a.tipo_actuacion] || {bg:'#F2EBE1',bc:'#C4A882',ic:'#5C3D1E',icon:'ti-notes'};
+    const badge = TIPO_BADGE[a.tipo_actuacion] || 'b-gray';
+    const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+    const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
+    return `<div class="act-card">
+      <div class="card-top">
+        <div class="card-tipo-icon" style="background:${est.bg};border:1px solid ${est.bc}">${getIcon(est.icon, est.ic)}</div>
+        <div class="card-main">
+          <div class="card-title">${a.descripcion?.slice(0,60)||a.tipo_actuacion}</div>
+          <div class="card-meta">
+            <span class="card-date"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fecha}</span>
+            <span class="badge ${badge}">${getIcon(est.icon,'currentColor','11px')}${a.tipo_actuacion}</span>
+            ${parc?`<span class="badge b-gray"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${parc.nombre_parcela}</span>`:''}
+          </div>
+        </div>
+      </div>
+      ${a.descripcion?`<div class="card-desc">${a.descripcion}</div>`:''}
+      <div class="card-footer">
+        <span class="card-people">${getIcon(a.operario?'ti-users':'ti-user','currentColor','13px')}${a.operario||CFG.titular||'Titular'}</span>
+        <button class="btn-card-edit" onclick="editarActuacion('${a.actuacion_id}')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function guardarActuacion() {
+  const parcela_id  = document.getElementById('f-parcela').value;
+  const tipoBtn     = document.querySelector('.tipo-btn.sel');
+  const descripcion = document.getElementById('f-desc').value.trim();
+  const fecha       = document.getElementById('f-fecha').value;
+  if (!parcela_id||!tipoBtn||!descripcion) { showToast('Falta parcela, tipo o descripción', true); return; }
+
+  const payload = {
+    parcela_id, descripcion, fecha,
+    tipo_actuacion: tipoBtn.dataset.tipo,
+    operario:       [...document.querySelectorAll('#op-lista .op-name')].map(n=>n.textContent).join(', ')||null,
+    horas_titular:  parseFloat(document.getElementById('titular-h').value)||null,
+    observaciones:  document.getElementById('f-obs').value.trim()||null,
+    url_adjunto:    document.getElementById('f-enlace').value.trim()||null,
+    updated_at:     new Date().toISOString()
+  };
+  if (tipoBtn.dataset.tipo==='Fitosanitario') {
+    payload.fito_problema = document.getElementById('fito-problema').value.trim()||null;
+    payload.fito_producto = document.getElementById('fito-producto').value.trim()||null;
+    payload.fito_registro = document.getElementById('fito-registro').value.trim()||null;
+    payload.fito_materia  = document.getElementById('fito-materia').value.trim()||null;
+    payload.fito_dosis    = document.getElementById('fito-dosis').value.trim()||null;
+    payload.fito_sup_ha   = parseFloat(document.getElementById('fito-sup').value)||null;
+    payload.fito_equipo   = document.getElementById('fito-equipo').value.trim()||null;
+  }
+  try {
+    if (editandoId) {
+      await db.update('actuaciones', editandoId, payload);
+      showToast('Actuación actualizada ✓');
+      cancelarEdicion();
+    } else {
+      payload.actuacion_id = crypto.randomUUID();
+      payload.created_at   = new Date().toISOString();
+      await db.insert('actuaciones', payload);
+      showToast('Actuación guardada ✓');
+      resetFormulario();
+    }
+    await cargarActuaciones();
+  } catch(e) { showToast('Error: '+e.message, true); }
+}
+
+function editarActuacion(id) {
+  const a = ACTUACIONES.find(x=>x.actuacion_id===id);
+  if (!a) return;
+  editandoId = id;
+  goTo('nueva', document.getElementById('nav-nueva'));
+  document.getElementById('f-fecha').value      = a.fecha||'';
+  document.getElementById('f-parcela').value    = a.parcela_id||'';
+  document.getElementById('f-desc').value       = a.descripcion||'';
+  document.getElementById('f-obs').value        = a.observaciones||'';
+  document.getElementById('f-enlace').value     = a.url_adjunto||'';
+  document.getElementById('titular-h').value    = a.horas_titular||'';
+  document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.toggle('sel',b.dataset.tipo===a.tipo_actuacion));
+  if (a.tipo_actuacion==='Fitosanitario') {
+    document.getElementById('fito-block').classList.add('show');
+    ['problema','producto','registro','materia','dosis','equipo'].forEach(k=>{
+      document.getElementById('fito-'+k).value = a['fito_'+k]||'';
+    });
+    document.getElementById('fito-sup').value = a.fito_sup_ha||'';
+  }
+  document.getElementById('edit-banner').classList.add('show');
+  document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
+  window.scrollTo(0,0);
+}
+
+function cancelarEdicion() {
+  editandoId = null;
+  resetFormulario();
+  document.getElementById('edit-banner').classList.remove('show');
+  document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar actuación';
+}
+
+function resetFormulario() {
+  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-parcela').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-obs').value = '';
+  document.getElementById('f-enlace').value = '';
+  document.getElementById('titular-h').value = '';
+  document.getElementById('op-lista').innerHTML = '';
+  document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('fito-block').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+//  NAVEGACIÓN
+// ══════════════════════════════════════════════
+function goTo(id, btn) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  if (btn && btn.classList.contains('nav-item')) btn.classList.add('active');
+  const titles = {nueva:'Nueva actuación',historial:'Historial',parcelas:'Parcelas',jornales:'Jornales',config:'Configuración'};
+  document.getElementById('topbar-h').textContent = titles[id]||id;
+  const c = document.getElementById('topbar-count');
+  if (id==='historial') { c.style.display=''; renderHistorial(); } else c.style.display='none';
+  if (id==='historial'&&!parcelaFiltro) resetBanner();
+  if (id==='parcelas') renderParcelas();
+  if (id==='jornales') initJornales();
+  if (id==='config') cargarCfgForm();
+}
+
+function syncBnav(id) {
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-'+id)?.classList.add('active');
+}
+
+function irAParcela(id, nombre, sub, sup) {
+  parcelaFiltro = id;
+  document.getElementById('h-parc').value = id;
+  document.getElementById('b-name').textContent = nombre;
+  document.getElementById('b-sub').textContent  = sub;
+  document.getElementById('b-sup').innerHTML    = `${sup} <span>ha</span>`;
+  document.getElementById('parcela-banner').style.display = 'block';
+  tipoSel = '';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','filtrado'));
+  const t = document.querySelector('.todas-chip');
+  t.classList.add('sel','filtrado');
+  t.innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Quitar filtro';
+  renderHistorial();
+  goTo('historial', document.getElementById('nav-historial'));
+  syncBnav('historial');
+}
+
+function resetBanner() {
+  parcelaFiltro = '';
+  document.getElementById('h-parc').value = '';
+  document.getElementById('parcela-banner').style.display = 'none';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','filtrado'));
+  const t = document.querySelector('.todas-chip');
+  t.classList.add('sel');
+  t.innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Todas';
+  renderHistorial();
+}
+
+// ══════════════════════════════════════════════
+//  FILTROS
+// ══════════════════════════════════════════════
+function selChip(btn, esTodas) {
+  if (esTodas) { resetBanner(); return; }
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  btn.classList.add('sel');
+  tipoSel = btn.dataset.tipo;
+  renderHistorial();
+}
+function toggleHF() {
+  document.getElementById('h-filters').classList.toggle('open');
+  document.getElementById('h-fbtn').classList.toggle('active');
+}
+function clearHF() {
+  document.getElementById('h-search').value = '';
+  document.getElementById('h-parc').value   = '';
+  document.getElementById('h-camp').value   = '';
+  parcelaFiltro = '';
+  document.getElementById('parcela-banner').style.display='none';
+  tipoSel = '';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','filtrado'));
+  const t=document.querySelector('.todas-chip');t.classList.add('sel');
+  t.innerHTML='<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Todas';
+  renderHistorial();
+}
+
+// ══════════════════════════════════════════════
+//  FORMULARIO
+// ══════════════════════════════════════════════
+function selTipo(btn) {
+  document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('fito-block').classList.toggle('show', btn.dataset.tipo==='Fitosanitario');
+}
+function adjTab(id, btn) {
+  document.querySelectorAll('.adj-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.adj-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ap-'+id).classList.add('active');
+}
+function addOp() {
+  const sel=document.getElementById('op-sel'), h=document.getElementById('op-h').value, name=sel.value;
+  if (!name) return;
+  const row=document.createElement('div'); row.className='op-row';
+  row.innerHTML=`<svg width="15px" height="15px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="op-name">${name}</span><div class="h-wrap"><svg width="13px" height="13px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)"" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><input type="number" class="h-input" value="${h||''}" placeholder="h." min="0" step="0.5"></div><button class="btn-icon" onclick="this.parentElement.remove()"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+  document.getElementById('op-lista').appendChild(row);
+  sel.value=''; document.getElementById('op-h').value='';
+}
+function previewFile(input, prevId) {
+  const file=input.files[0]; if (!file) return;
+  const prev=document.getElementById(prevId);
+  const img=document.getElementById(prevId+'-img');
+  document.getElementById(prevId+'-name').textContent=file.name;
+  if (file.type.startsWith('image/')) { const r=new FileReader(); r.onload=e=>{img.src=e.target.result;img.style.display='block'}; r.readAsDataURL(file); } else img.style.display='none';
+  prev.style.display='block';
+}
+function clearPreview(prevId, inputId) {
+  document.getElementById(prevId).style.display='none';
+  document.getElementById(prevId+'-img').src='';
+  document.getElementById(inputId).value='';
+}
+function togglePF() {
+  const f=document.getElementById('p-form'), open=f.classList.toggle('open');
+  document.getElementById('p-add-toggle').style.display=open?'none':'flex';
+}
+
+// ══════════════════════════════════════════════
+//  CONFIGURACIÓN
+// ══════════════════════════════════════════════
+function cargarCfgForm() {
+  document.getElementById('cfg-nombre').value  = CFG.nombre||'';
+  document.getElementById('cfg-titular').value = CFG.titular||'';
+  document.getElementById('cfg-nif').value     = CFG.nif||'';
+  document.getElementById('cfg-campana').value = CFG.campana||'2026';
+  document.getElementById('cfg-tel').value     = CFG.telefono||'';
+  renderCfgOps();
+}
+function renderCfgOps() {
+  document.getElementById('cfg-op-pills').innerHTML = (CFG.operarios||[]).map((op,i)=>
+    `<span class="op-pill"><svg width="13px" height="13px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)"" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${op}<button class="btn-icon" onclick="quitarCfgOp(${i})" style="margin-left:2px"><svg width="12px" height="12px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></span>`
+  ).join('');
+  document.getElementById('op-sel').innerHTML = '<option value="">Añadir operario…</option>' +
+    (CFG.operarios||[]).map(op=>`<option>${op}</option>`).join('');
+}
+function addCfgOp() {
+  const input=document.getElementById('cfg-op-input'), name=input.value.trim();
+  if (!name) return;
+  CFG.operarios=[...(CFG.operarios||[]),name]; input.value=''; renderCfgOps();
+}
+function quitarCfgOp(i) { CFG.operarios.splice(i,1); renderCfgOps(); }
+function guardarCfg() {
+  CFG.nombre   = document.getElementById('cfg-nombre').value.trim();
+  CFG.titular  = document.getElementById('cfg-titular').value.trim();
+  CFG.nif      = document.getElementById('cfg-nif').value.trim();
+  CFG.campana  = document.getElementById('cfg-campana').value.trim();
+  CFG.telefono = document.getElementById('cfg-tel').value.trim();
+  localStorage.setItem('cfg', JSON.stringify(CFG));
+  aplicarCfg();
+  showToast('Configuración guardada');
+}
+async function verificarConexion() {
+  const el=document.getElementById('cfg-db-estado');
+  try { await db.ping(); el.textContent='Conectado'; el.className='iv ok'; }
+  catch(e) { el.textContent='Sin conexión'; el.style.color='var(--red)'; }
+}
+async function pingManual() { showToast('Ping enviado…'); await verificarConexion(); showToast('Ping OK ✓'); }
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+let _tt;
+function showToast(msg, isErr=false) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.className='toast'+(isErr?' err':'')+' show';
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════════════
+//  JORNALES
+// ══════════════════════════════════════════════
+const MESES_N = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let jModo = 'anual';
+
+function initJornales() {
+  // populate años
+  const años = [...new Set(ACTUACIONES.map(a=>a.fecha?.slice(0,4)).filter(Boolean))].sort().reverse();
+  if (!años.length) años.push(new Date().getFullYear().toString());
+  const sel = document.getElementById('j-año');
+  sel.innerHTML = años.map(y=>`<option value="${y}">${y}</option>`).join('');
+  renderJornales();
+}
+
+function setJModo(m, btn) {
+  jModo = m;
+  document.getElementById('jt-anual').style.background  = m==='anual'  ? '#2D5016' : '#FFFEF9';
+  document.getElementById('jt-anual').style.color       = m==='anual'  ? '#E8F0DC' : '#7A7260';
+  document.getElementById('jt-mensual').style.background= m==='mensual'? '#2D5016' : '#FFFEF9';
+  document.getElementById('jt-mensual').style.color     = m==='mensual'? '#E8F0DC' : '#7A7260';
+  document.getElementById('j-mes').style.display = m==='mensual' ? '' : 'none';
+  renderJornales();
+}
+
+function filtrarJornales() {
+  const año = document.getElementById('j-año').value;
+  const mes = document.getElementById('j-mes').value;
+  return ACTUACIONES.filter(a => {
+    const [y,m] = (a.fecha||'').split('-');
+    return y===año && (jModo==='anual' || m===mes);
+  });
+}
+
+function renderJornales() {
+  const acts = filtrarJornales();
+  const año  = document.getElementById('j-año').value;
+  const mes  = document.getElementById('j-mes').value;
+
+  // Build per-person map from actuaciones
+  const opMap = {};
+  acts.forEach(a => {
+    const titular = CFG.titular || 'Titular';
+    const hTitular = a.horas_titular || 0;
+    if (hTitular > 0) {
+      if (!opMap[titular]) opMap[titular] = {horas:0, acts:[]};
+      opMap[titular].horas += hTitular;
+      opMap[titular].acts.push({...a, horasOp: hTitular});
+    }
+    // Parse operario field "Juan García: 3h, Pedro: 4h" or plain name
+    if (a.operario) {
+      const partes = a.operario.split(',');
+      partes.forEach(p => {
+        const nombre = p.trim().replace(/:\s*[\d.]+h?/i,'').trim();
+        if (!nombre) return;
+        if (!opMap[nombre]) opMap[nombre] = {horas:0, acts:[]};
+        opMap[nombre].horas += 1; // fallback if no hours stored separately
+        opMap[nombre].acts.push({...a, horasOp: 1});
+      });
+    }
+  });
+
+  const totalH   = Object.values(opMap).reduce((s,o)=>s+o.horas, 0);
+  const totalOps = Object.keys(opMap).length;
+  const totalParc= new Set(acts.map(a=>a.parcela_id)).size;
+  const label    = jModo==='anual' ? `Total ${año}` : `${MESES_N[parseInt(mes)]} ${año}`;
+
+  document.getElementById('j-total-label').textContent = label;
+  document.getElementById('j-total-h').textContent     = totalH + ' h';
+  document.getElementById('j-total-sub').textContent   = `${acts.length} actuaciones · ${totalOps} personas`;
+  document.getElementById('j-ts-acts').textContent     = acts.length;
+  document.getElementById('j-ts-ops').textContent      = totalOps;
+  document.getElementById('j-ts-parc').textContent     = totalParc;
+
+  const ops = Object.entries(opMap).sort((a,b)=>b[1].horas-a[1].horas);
+  const maxH = Math.max(...ops.map(o=>o[1].horas), 1);
+
+  if (!ops.length) {
+    document.getElementById('j-op-lista').innerHTML = '<div style="text-align:center;padding:40px;color:#7A7260;font-size:14px;font-weight:500">Sin actuaciones con horas en este período</div>';
+    return;
+  }
+
+  const TIPO_COL = {Poda:'#F0E6CC',Desbroce:'#F2EBE1',Laboreo:'#F2EBE1',Abonado:'#E1F5EE',Fitosanitario:'#E8F0DC',Recolección:'#E6F1FB',Incidencia:'#FCEAEA',Observación:'#F2EBE1'};
+  const TIPO_TXT = {Poda:'#5C3D1E',Desbroce:'#5C3D1E',Laboreo:'#5C3D1E',Abonado:'#0F6E56',Fitosanitario:'#2D5016',Recolección:'#185FA5',Incidencia:'#8B2020',Observación:'#5C3D1E'};
+
+  document.getElementById('j-op-lista').innerHTML = ops.map(([nombre, data]) => {
+    const ini  = nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    const pct  = Math.round(data.horas / maxH * 100);
+    // group by month
+    const mesMapa = {};
+    data.acts.forEach(a => {
+      const mk = (a.fecha||'').slice(0,7);
+      if (!mesMapa[mk]) mesMapa[mk] = [];
+      mesMapa[mk].push(a);
+    });
+    const mesRows = Object.entries(mesMapa).sort((a,b)=>b[0].localeCompare(a[0])).map(([key, mactos]) => {
+      const [y,m] = key.split('-');
+      const hMes  = mactos.reduce((s,a)=>s+a.horasOp,0);
+      const actRows = mactos.map(a => {
+        const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
+        const parc  = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:0.5px solid rgba(92,61,30,0.1)">
+          <span style="font-size:11px;font-weight:600;color:#7A7260;white-space:nowrap;width:58px;flex-shrink:0">${fecha}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;text-transform:uppercase;background:${TIPO_COL[a.tipo_actuacion]||'#F2EBE1'};color:${TIPO_TXT[a.tipo_actuacion]||'#5C3D1E'}">${a.tipo_actuacion||''}</span>
+          <span style="font-size:12px;color:#4A4535;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.descripcion||''}</span>
+          ${parc?`<span style="font-size:11px;color:#7A7260;white-space:nowrap;flex-shrink:0">${parc.nombre_parcela}</span>`:''}
+          <span style="font-size:13px;font-weight:700;color:#2D5016;white-space:nowrap;flex-shrink:0">${a.horasOp} h</span>
+        </div>`;
+      }).join('');
+      return `<div onclick="this.nextElementSibling.classList.toggle('open')" style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(92,61,30,0.1);cursor:pointer;transition:background .15s" onmouseover="this.style.background='#F5F0E8'" onmouseout="this.style.background=''">
+        <span style="font-size:13px;font-weight:600;color:#1C1A14">${MESES_N[parseInt(m)]} ${y}</span>
+        <span style="font-size:12px;color:#7A7260;text-align:center">${mactos.length} act.</span>
+        <span style="font-size:13px;font-weight:700;color:#2D5016;text-align:right;white-space:nowrap">${hMes} h</span>
+      </div>
+      <div class="op-acts-sub" style="display:none;border-bottom:1px solid rgba(92,61,30,0.1)">${actRows}</div>`;
+    }).join('');
+
+    return `<div style="background:#FFFEF9;border:1px solid rgba(92,61,30,0.15);border-radius:10px;margin-bottom:10px;overflow:hidden">
+      <div onclick="this.parentElement.querySelector('.op-detail-inner').classList.toggle('open');this.querySelector('.op-chev').style.transform=this.parentElement.querySelector('.op-detail-inner').classList.contains('open')?'rotate(90deg)':''"
+        style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#F5F0E8'" onmouseout="this.style.background=''">
+        <div style="width:40px;height:40px;border-radius:50%;background:#E8F0DC;border:1.5px solid #7BA05B;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:#2D5016">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#1C1A14">${nombre}</div>
+          <div style="font-size:11px;color:#7A7260;margin-top:2px">${data.acts.length} actuación${data.acts.length!==1?'es':''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:22px;font-weight:700;color:#2D5016;line-height:1">${data.horas}</div>
+          <div style="font-size:10px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em">horas</div>
+        </div>
+        <svg class="op-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A7260" stroke-width="2.5" style="flex-shrink:0;margin-left:4px;transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div style="padding:0 16px 10px">
+        <div style="height:6px;background:#F5F0E8;border-radius:3px;border:1px solid rgba(92,61,30,0.1);overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:#2D5016;border-radius:3px;transition:width .4s"></div>
+        </div>
+      </div>
+      <div class="op-detail-inner" style="display:none;border-top:1px solid rgba(92,61,30,0.1)">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:7px 16px;background:#F5F0E8;font-size:10px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.06em">
+          <span>Mes</span><span>Actu.</span><span>Horas</span>
+        </div>
+        ${mesRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportJornalesCSV() {
+  const acts = filtrarJornales();
+  const rows = [['Fecha','Tipo','Parcela','Descripción','Operario','Horas']];
+  acts.forEach(a => {
+    const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+    const titular = CFG.titular || 'Titular';
+    if (a.horas_titular) rows.push([a.fecha, a.tipo_actuacion, parc?.nombre_parcela||'', `"${a.descripcion||''}"`, titular, a.horas_titular]);
+    if (a.operario) {
+      a.operario.split(',').forEach(op => {
+        rows.push([a.fecha, a.tipo_actuacion, parc?.nombre_parcela||'', `"${a.descripcion||''}"`, op.trim(), '']);
+      });
+    }
+  });
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const el   = document.createElement('a');
+  const año  = document.getElementById('j-año').value;
+  el.href = url; el.download = `jornales_${año}.csv`; el.click();
+  URL.revokeObjectURL(url);
+}
+
+</script>
+</body>
+</html>
