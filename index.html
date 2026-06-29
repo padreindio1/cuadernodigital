@@ -575,6 +575,7 @@ const db = {
   insert: (t, b)       => sbFetch(t, {method:'POST', body:JSON.stringify(b)}),
   update: (t, id, b)   => sbFetch(`${t}?actuacion_id=eq.${id}`, {method:'PATCH', body:JSON.stringify(b)}),
   updParcela:(t,id,b)  => sbFetch(`${t}?parcela_id=eq.${id}`,   {method:'PATCH', body:JSON.stringify(b)}),
+  delParcela:(id)      => sbFetch(`parcelas?parcela_id=eq.${id}`, {method:'DELETE', prefer:'return=minimal'}),
   ping:   ()           => sbFetch('actuaciones?limit=1')
 };
 
@@ -668,7 +669,7 @@ function renderParcelas() {
     return `<div class="parcela-card" onclick="irAParcela('${p.parcela_id}','${p.nombre_parcela}','${p.cultivo}${p.variedad?' · '+p.variedad:''}${p.secano_regadio?' · '+p.secano_regadio:''}','${p.superficie_ha}')">
       <div class="pc-top"><div class="pc-icon"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 7H8z"/><path d="M10 10l4 7H6z"/><path d="M8 17l4 7H4z"/><line x1="12" y1="3" x2="12" y2="24"/></svg></div><div style="flex:1;min-width:0"><div class="pc-name">${p.nombre_parcela}</div><div class="pc-sub">${p.ref_sigpac||'Sin ref. SIGPAC'}</div></div><div class="pc-sup">${p.superficie_ha} <span>ha</span></div></div>
       <div class="pc-tags"><span class="tag t-oliva"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10M12 9v12M12 9C12 9 8 7 6 3c3 0 5.5 1.5 6 6zM12 9c0 0 4-2 6-6-3 0-5.5 1.5-6 6z"/></svg>${p.cultivo}</span>${varTag}${regTag}</div>
-      <div class="pc-footer"><span class="pc-acts"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 22l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"/></svg>${acts} actuación${acts!==1?'es':''}</span><span class="pc-link"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Ver actuaciones</span></div>
+      <div class="pc-footer"><span class="pc-acts"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 22l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"/></svg>${acts} actuación${acts!==1?'es':''}</span><span class="pc-link"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Ver actuaciones</span><button class="btn-icon" style="margin-left:auto;width:30px;height:30px;flex-shrink:0" onclick="eliminarParcela('${p.parcela_id}','${p.nombre_parcela}',event)" title="Eliminar parcela"><svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div>
     </div>`;
   }).join('');
 }
@@ -707,6 +708,20 @@ async function guardarParcela() {
     togglePF();
     await cargarParcelas();
   } catch(e) { showToast('Error al guardar parcela', true); }
+}
+
+async function eliminarParcela(id, nombre, event) {
+  event.stopPropagation();
+  const actsCount = ACTUACIONES.filter(a => a.parcela_id === id).length;
+  const msg = actsCount > 0
+    ? `u00bfEliminar "${nombre}"?\n\nTiene ${actsCount} actuaciu00f3n${actsCount!==1?"es":""} registrada${actsCount!==1?"s":""}. Las actuaciones NO se eliminaru00e1n pero quedaru00e1n sin parcela asignada.`
+    : `u00bfEliminar la parcela "${nombre}"?\n\nEsta acciu00f3n no se puede deshacer.`;
+  if (!confirm(msg)) return;
+  try {
+    await db.delParcela(id);
+    showToast(`Parcela "${nombre}" eliminada`);
+    await cargarParcelas();
+  } catch(e) { showToast("Error al eliminar parcela", true); }
 }
 
 // ══════════════════════════════════════════════
