@@ -1153,33 +1153,31 @@ function renderJornales() {
   const año  = document.getElementById('j-año').value;
   const mes  = document.getElementById('j-mes').value;
 
-  // Build per-person map from actuaciones
+  // Construir mapa por persona
   const opMap = {};
   acts.forEach(a => {
     const titular = CFG.titular || 'Titular';
-    const hTitular = a.horas_titular || 0;
+    const hTitular = parseFloat(a.horas_titular) || 0;
     if (hTitular > 0) {
       if (!opMap[titular]) opMap[titular] = {horas:0, acts:[]};
       opMap[titular].horas += hTitular;
       opMap[titular].acts.push({...a, horasOp: hTitular});
     }
-    // Parse operario field "Juan García: 3h, Pedro: 4h" or plain name
     if (a.operario) {
-      const partes = a.operario.split(',');
-      partes.forEach(p => {
+      a.operario.split(',').forEach(p => {
         const nombre = p.trim().replace(/:\s*[\d.]+h?/i,'').trim();
         if (!nombre) return;
         if (!opMap[nombre]) opMap[nombre] = {horas:0, acts:[]};
-        opMap[nombre].horas += 1; // fallback if no hours stored separately
+        opMap[nombre].horas += 1;
         opMap[nombre].acts.push({...a, horasOp: 1});
       });
     }
   });
 
-  const totalH   = Object.values(opMap).reduce((s,o)=>s+o.horas, 0);
-  const totalOps = Object.keys(opMap).length;
-  const totalParc= new Set(acts.map(a=>a.parcela_id)).size;
-  const label    = jModo==='anual' ? `Total ${año}` : `${MESES_N[parseInt(mes)]} ${año}`;
+  const totalH    = Object.values(opMap).reduce((s,o)=>s+o.horas, 0);
+  const totalOps  = Object.keys(opMap).length;
+  const totalParc = new Set(acts.map(a=>a.parcela_id)).size;
+  const label     = jModo==='anual' ? `Total ${año}` : `${MESES_N[parseInt(mes)]} ${año}`;
 
   document.getElementById('j-total-label').textContent = label;
   document.getElementById('j-total-h').textContent     = totalH + ' h';
@@ -1188,7 +1186,7 @@ function renderJornales() {
   document.getElementById('j-ts-ops').textContent      = totalOps;
   document.getElementById('j-ts-parc').textContent     = totalParc;
 
-  const ops = Object.entries(opMap).sort((a,b)=>b[1].horas-a[1].horas);
+  const ops  = Object.entries(opMap).sort((a,b)=>b[1].horas-a[1].horas);
   const maxH = Math.max(...ops.map(o=>o[1].horas), 1);
 
   if (!ops.length) {
@@ -1200,40 +1198,33 @@ function renderJornales() {
   const TIPO_TXT = {Poda:'#5C3D1E',Desbroce:'#5C3D1E',Laboreo:'#5C3D1E',Abonado:'#0F6E56',Fitosanitario:'#2D5016',Recolección:'#185FA5',Incidencia:'#8B2020',Observación:'#5C3D1E'};
 
   document.getElementById('j-op-lista').innerHTML = ops.map(([nombre, data]) => {
-    const ini  = nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
-    const pct  = Math.round(data.horas / maxH * 100);
-    // group by month
-    const mesMapa = {};
-    data.acts.forEach(a => {
-      const mk = (a.fecha||'').slice(0,7);
-      if (!mesMapa[mk]) mesMapa[mk] = [];
-      mesMapa[mk].push(a);
-    });
-    const mesRows = Object.entries(mesMapa).sort((a,b)=>b[0].localeCompare(a[0])).map(([key, mactos]) => {
-      const [y,m] = key.split('-');
-      const hMes  = mactos.reduce((s,a)=>s+a.horasOp,0);
-      const actRows = mactos.map(a => {
-        const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
-        const parc  = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
-        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:0.5px solid rgba(92,61,30,0.1)">
-          <span style="font-size:11px;font-weight:600;color:#7A7260;white-space:nowrap;width:58px;flex-shrink:0">${fecha}</span>
-          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;text-transform:uppercase;background:${TIPO_COL[a.tipo_actuacion]||'#F2EBE1'};color:${TIPO_TXT[a.tipo_actuacion]||'#5C3D1E'}">${a.tipo_actuacion||''}</span>
-          <span style="font-size:12px;color:#4A4535;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.descripcion||''}</span>
-          ${parc?`<span style="font-size:11px;color:#7A7260;white-space:nowrap;flex-shrink:0">${parc.nombre_parcela}</span>`:''}
-          <span style="font-size:13px;font-weight:700;color:#2D5016;white-space:nowrap;flex-shrink:0">${a.horasOp} h</span>
-        </div>`;
-      }).join('');
-      return `<div onclick="this.nextElementSibling.classList.toggle('open')" style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(92,61,30,0.1);cursor:pointer;transition:background .15s" onmouseover="this.style.background='#F5F0E8'" onmouseout="this.style.background=''">
-        <span style="font-size:13px;font-weight:600;color:#1C1A14">${MESES_N[parseInt(m)]} ${y}</span>
-        <span style="font-size:12px;color:#7A7260;text-align:center">${mactos.length} act.</span>
-        <span style="font-size:13px;font-weight:700;color:#2D5016;text-align:right;white-space:nowrap">${hMes} h</span>
-      </div>
-      <div class="op-acts-sub" style="display:none;border-bottom:1px solid rgba(92,61,30,0.1)">${actRows}</div>`;
+    const ini = nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    const pct = Math.round(data.horas / maxH * 100);
+
+    // Filas de actuaciones ordenadas por fecha desc
+    const actsSorted = [...data.acts].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+    const actRows = actsSorted.map(a => {
+      const fechaAct = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit'}) : '';
+      const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+      const est  = TIPO_STYLE[a.tipo_actuacion] || {bg:'#F2EBE1',bc:'#C4A882',ic:'#5C3D1E',icon:'ti-notes'};
+      return `<div style="display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:center;padding:9px 16px;border-bottom:0.5px solid rgba(92,61,30,0.08);cursor:pointer" onclick="abrirOverview('${a.actuacion_id}')">
+        <span style="font-size:11px;font-weight:600;color:#7A7260;white-space:nowrap">${fechaAct}</span>
+        <div style="min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;flex-shrink:0;background:${TIPO_COL[a.tipo_actuacion]||'#F2EBE1'};color:${TIPO_TXT[a.tipo_actuacion]||'#5C3D1E'}">${a.tipo_actuacion||''}</span>
+            ${parc?`<span style="font-size:11px;color:#7A7260;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${parc.nombre_parcela}</span>`:''}
+          </div>
+          <div style="font-size:12px;color:#4A4535;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.descripcion||'—'}</div>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:#2D5016;white-space:nowrap;flex-shrink:0">${a.horasOp} h</span>
+      </div>`;
     }).join('');
 
     return `<div style="background:#FFFEF9;border:1px solid rgba(92,61,30,0.15);border-radius:10px;margin-bottom:10px;overflow:hidden">
-      <div onclick="this.parentElement.querySelector('.op-detail-inner').classList.toggle('open');this.querySelector('.op-chev').style.transform=this.parentElement.querySelector('.op-detail-inner').classList.contains('open')?'rotate(90deg)':''"
-        style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#F5F0E8'" onmouseout="this.style.background=''">
+      <!-- cabecera clickable -->
+      <div onclick="const d=this.nextElementSibling.nextElementSibling;const open=d.style.display==='block';d.style.display=open?'none':'block';this.querySelector('.op-chev').style.transform=open?'':'rotate(90deg)'"
+        style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s;user-select:none"
+        onmouseover="this.style.background='#F5F0E8'" onmouseout="this.style.background=''">
         <div style="width:40px;height:40px;border-radius:50%;background:#E8F0DC;border:1.5px solid #7BA05B;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:#2D5016">${ini}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;color:#1C1A14">${nombre}</div>
@@ -1245,16 +1236,18 @@ function renderJornales() {
         </div>
         <svg class="op-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A7260" stroke-width="2.5" style="flex-shrink:0;margin-left:4px;transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      <!-- barra progreso -->
       <div style="padding:0 16px 10px">
         <div style="height:6px;background:#F5F0E8;border-radius:3px;border:1px solid rgba(92,61,30,0.1);overflow:hidden">
           <div style="height:100%;width:${pct}%;background:#2D5016;border-radius:3px;transition:width .4s"></div>
         </div>
       </div>
-      <div class="op-detail-inner" style="display:none;border-top:1px solid rgba(92,61,30,0.1)">
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:7px 16px;background:#F5F0E8;font-size:10px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.06em">
-          <span>Mes</span><span>Actu.</span><span>Horas</span>
+      <!-- lista actuaciones -->
+      <div style="display:none;border-top:1px solid rgba(92,61,30,0.1)">
+        <div style="display:grid;grid-template-columns:52px 1fr auto;gap:8px;padding:6px 16px;background:#F5F0E8;font-size:10px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.06em">
+          <span>Fecha</span><span>Actuación</span><span>h.</span>
         </div>
-        ${mesRows}
+        ${actRows}
       </div>
     </div>`;
   }).join('');
