@@ -270,6 +270,43 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
   .content{padding:16px;padding-bottom:90px}
   .topbar{padding:12px 16px}
 }
+
+/* ── BADGE FOTO ── */
+.badge-foto{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:4px;background:#E6F1FB;color:#185FA5;border:1px solid #B5D4F4;white-space:nowrap}
+
+/* ── OVERVIEW MODAL ── */
+.ov-overlay{position:fixed;inset:0;background:rgba(28,26,20,.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov-overlay.open{opacity:1;pointer-events:all}
+.ov-drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:900px;max-height:92vh;background:#FFFEF9;border-radius:16px 16px 0 0;z-index:201;display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.32,1,.32,1);overflow:hidden}
+.ov-overlay.open .ov-drawer{transform:translateX(-50%) translateY(0)}
+.ov-handle{width:36px;height:4px;background:rgba(92,61,30,.2);border-radius:2px;margin:10px auto 0;flex-shrink:0}
+.ov-header{display:flex;align-items:center;gap:12px;padding:14px 20px 12px;border-bottom:1px solid rgba(92,61,30,.12);flex-shrink:0}
+.ov-tipo-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ov-title{flex:1;min-width:0}
+.ov-title h3{font-size:15px;font-weight:700;color:#1C1A14;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-title p{font-size:11px;color:#7A7260;margin:3px 0 0}
+.ov-close{width:32px;height:32px;border:1px solid rgba(92,61,30,.2) !important;border-radius:6px;background:#F5F0E8 !important;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#7A7260 !important;flex-shrink:0}
+.ov-body{overflow-y:auto;padding:16px 20px 24px;flex:1}
+.ov-foto{width:100%;border-radius:10px;overflow:hidden;margin-bottom:16px;border:1px solid rgba(92,61,30,.15)}
+.ov-foto img{width:100%;max-height:220px;object-fit:cover;display:block}
+.ov-foto-link{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#F5F0E8;border-radius:10px;margin-bottom:16px;border:1px solid rgba(92,61,30,.15);cursor:pointer}
+.ov-foto-link span{font-size:13px;color:#185FA5;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-section{margin-bottom:14px}
+.ov-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#7A7260;margin-bottom:8px}
+.ov-row{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:0.5px solid rgba(92,61,30,.08)}
+.ov-row:last-child{border-bottom:none}
+.ov-label{font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;width:110px;flex-shrink:0}
+.ov-val{font-size:13px;color:#1C1A14;flex:1}
+.ov-desc{font-size:14px;color:#1C1A14;line-height:1.6;padding:10px 12px;background:#F5F0E8;border-radius:8px;margin-bottom:14px}
+.ov-footer{padding:12px 20px 16px;border-top:1px solid rgba(92,61,30,.12);display:flex;gap:8px;flex-shrink:0;background:#FFFEF9}
+.ov-btn-edit{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;background:#2D5016 !important;color:#E8F0DC !important;border:none !important;border-radius:10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.ov-btn-del{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#FFFEF9 !important;border:1px solid rgba(92,61,30,.2) !important;border-radius:10px;cursor:pointer;color:#7A7260 !important;flex-shrink:0}
+.ov-btn-del:hover{background:#FCEAEA !important;border-color:#D48080 !important;color:#8B2020 !important}
+.ov-fito-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:400px){.ov-fito-grid{grid-template-columns:1fr}}
+.ov-fito-cell{background:#F2F8EA;border:1px solid #C5DFA0;border-radius:8px;padding:10px 12px}
+.ov-fito-cell .lbl{font-size:10px;font-weight:700;color:#4A7A25;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.ov-fito-cell .val{font-size:13px;color:#1C1A14;font-weight:600}
 </style>
 </head>
 <body>
@@ -543,6 +580,27 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
   </nav>
 </div>
 
+
+<!-- ══ OVERVIEW MODAL ══ -->
+<div class="ov-overlay" id="ov-overlay" onclick="ovClose(event)">
+  <div class="ov-drawer" id="ov-drawer">
+    <div class="ov-handle"></div>
+    <div class="ov-header">
+      <div class="ov-tipo-icon" id="ov-tipo-icon"></div>
+      <div class="ov-title">
+        <h3 id="ov-titulo"></h3>
+        <p id="ov-subtitulo"></p>
+      </div>
+      <button class="ov-close" onclick="cerrarOverview()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="ov-body" id="ov-body"></div>
+    <div class="ov-footer">
+      <button class="ov-btn-edit" id="ov-btn-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar actuación</button>
+      <button class="ov-btn-del" id="ov-btn-del" title="Eliminar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg">Guardado</span></div>
 
 <script>
@@ -574,7 +632,6 @@ const db = {
   get:    (t, q='')    => sbFetch(`${t}?${q}&order=created_at.desc`),
   insert: (t, b)       => sbFetch(t, {method:'POST', body:JSON.stringify(b)}),
   update: (t, id, b)   => sbFetch(`${t}?actuacion_id=eq.${id}`, {method:'PATCH', body:JSON.stringify(b)}),
-  del:    (id)         => sbFetch(`actuaciones?actuacion_id=eq.${id}`, {method:'DELETE', prefer:'return=minimal'}),
   updParcela:(t,id,b)  => sbFetch(`${t}?parcela_id=eq.${id}`,   {method:'PATCH', body:JSON.stringify(b)}),
   delParcela:(id)      => sbFetch(`parcelas?parcela_id=eq.${id}`, {method:'DELETE', prefer:'return=minimal'}),
   ping:   ()           => sbFetch('actuaciones?limit=1')
@@ -588,14 +645,22 @@ let PARCELAS = [], ACTUACIONES = [];
 let tipoSel = '', parcelaFiltro = '', editandoId = null;
 
 const SVG_ICONS = {
-  'ti-cut': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
-  'ti-rake': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8l2-4M19 8l-2-4M9 8l-1 4M15 8l1 4M10 12l2 8M14 12l-2 8"/></svg>`,
-  'ti-tractor': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="2"/><path d="M5 17V9l4-5h6l2 4v9"/><path d="M9 4v8h10"/></svg>`,
-  'ti-droplet-half-2': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 9.5 6 14a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><line x1="6" y1="14" x2="18" y2="14"/></svg>`,
-  'ti-spray': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4v4H3z"/><path d="M7 5h3"/><path d="M10 3v4"/><path d="M10 5c3 0 5 2 5 5v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-9c0-3 2-5 4-5z"/><line x1="14" y1="9" x2="16" y2="7"/><line x1="14" y1="7" x2="16" y2="9"/><line x1="17" y1="6" x2="19" y2="4"/><line x1="17" y1="4" x2="19" y2="6"/></svg>`,
-  'ti-basket': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg>`,
-  'ti-alert-triangle': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-  'ti-eye': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  // Poda — tijeras de podar con ramas
+  'ti-cut': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3C6 3 4 7 4 10a2 2 0 0 0 4 0c0-3-2-7-2-7z"/><path d="M18 3c0 0 2 4 2 7a2 2 0 0 1-4 0c0-3 2-7 2-7z"/><path d="M8 10l8 0"/><path d="M6 20l6-5 6 5"/><path d="M12 15v-3"/></svg>`,
+  // Desbroce — guadaña / cizalla
+  'ti-rake': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-9"/><path d="M12 12l5-5"/><path d="M17 7c0 0 1.5-1.5 3-1 .5 1.5-1 3-1 3z"/><path d="M14 10c0 0-1-2 0-3.5C15.5 5.5 17 7 17 7"/><path d="M7 17c0 0-2-1-2-3 1.5-.5 3 1 3 1"/><path d="M5 14c0 0-1.5-1.5-1-3 1.5-.5 3 1 3 1"/></svg>`,
+  // Laboreo — tractor simplificado pero reconocible
+  'ti-tractor': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17" r="3.5"/><circle cx="17" cy="17.5" r="2.5"/><path d="M3 17V9l3-5h7l2 5v8"/><path d="M6 7h8"/><path d="M13 7l1.5 5H20v-3l-2-2h-4"/></svg>`,
+  // Abonado — saco con gránulos cayendo
+  'ti-droplet-half-2': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l1 5H7z"/><path d="M7 8v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V8"/><line x1="10" y1="12" x2="10" y2="15"/><line x1="14" y1="11" x2="14" y2="14"/><line x1="12" y1="13" x2="12" y2="16"/></svg>`,
+  // Fitosanitario — pulverizador con gotas
+  'ti-spray': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h4V5H5v4z"/><path d="M9 7h2"/><path d="M11 9v8a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-8c0-2-1.5-3.5-3-3.5S11 7 11 9z"/><circle cx="17.5" cy="5.5" r="1" fill="currentColor"/><circle cx="20" cy="4" r="1" fill="currentColor"/><circle cx="19" cy="7.5" r="1" fill="currentColor"/></svg>`,
+  // Recolección — cesto de aceitunas con oliva encima
+  'ti-basket': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l-2 10h16L18 10H6z"/><path d="M4 10h16"/><path d="M12 3c0 0-2 1.5-2 3.5S12 10 12 10s2-1.5 2-3.5S12 3 12 3z"/><line x1="12" y1="6" x2="12" y2="10"/></svg>`,
+  // Incidencia — señal de advertencia con rayo
+  'ti-alert-triangle': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><polyline points="13 9 12 13 11 9"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  // Observación — ojo con lupa
+  'ti-eye': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><circle cx="15" cy="9" r="1" fill="currentColor" stroke="none"/></svg>`,
   'ti-notes': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>`,
   'ti-users': `<svg width="13px" height="13px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
   'ti-user': `<svg width="13px" height="13px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
@@ -770,7 +835,8 @@ function renderHistorial() {
     const badge = TIPO_BADGE[a.tipo_actuacion] || 'b-gray';
     const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
     const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
-    return `<div class="act-card">
+    const tieneFoto = !!(a.url_adjunto);
+    return `<div class="act-card" onclick="abrirOverview('${a.actuacion_id}')">
       <div class="card-top">
         <div class="card-tipo-icon" style="background:${est.bg};border:1px solid ${est.bc}">${getIcon(est.icon, est.ic)}</div>
         <div class="card-main">
@@ -779,15 +845,15 @@ function renderHistorial() {
             <span class="card-date"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fecha}</span>
             <span class="badge ${badge}">${getIcon(est.icon,'currentColor','11px')}${a.tipo_actuacion}</span>
             ${parc?`<span class="badge b-gray"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${parc.nombre_parcela}</span>`:''}
+            ${tieneFoto?`<span class="badge-foto"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Foto</span>`:''}
           </div>
         </div>
       </div>
       ${a.descripcion?`<div class="card-desc">${a.descripcion}</div>`:''}
       <div class="card-footer">
         <span class="card-people">${getIcon(a.operario?'ti-users':'ti-user','currentColor','13px')}${a.operario||CFG.titular||'Titular'}</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button class="btn-card-edit" onclick="editarActuacion('${a.actuacion_id}')"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>
-          <button class="btn-icon" onclick="borrarActuacion('${a.actuacion_id}',event)" title="Eliminar actuación"><svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:600;color:#7A7260;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Ver detalle</span>
         </div>
       </div>
     </div>`;
@@ -857,21 +923,6 @@ function editarActuacion(id) {
   document.getElementById('edit-banner').classList.add('show');
   document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
   window.scrollTo(0,0);
-}
-
-async function borrarActuacion(id, event) {
-  event.stopPropagation();
-  const a = ACTUACIONES.find(x=>x.actuacion_id===id);
-  if (!a) return;
-  const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
-  const desc = a.descripcion ? `"${a.descripcion.slice(0,50)}"` : a.tipo_actuacion;
-  const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
-  if (!confirm(`¿Eliminar esta actuación?\n\n${desc}\n${fecha}${parc?' · '+parc.nombre_parcela:''}\n\nEsta acción no se puede deshacer.`)) return;
-  try {
-    await db.del(id);
-    showToast('Actuación eliminada');
-    await cargarActuaciones();
-  } catch(e) { showToast('Error al eliminar', true); }
 }
 
 function cancelarEdicion() {
@@ -1230,6 +1281,118 @@ function exportJornalesCSV() {
   el.href = url; el.download = `jornales_${año}.csv`; el.click();
   URL.revokeObjectURL(url);
 }
+
+// ══════════════════════════════════════════════
+//  OVERVIEW MODAL
+// ══════════════════════════════════════════════
+let ovActuacionId = null;
+
+function abrirOverview(id) {
+  const a = ACTUACIONES.find(x=>x.actuacion_id===id);
+  if (!a) return;
+  ovActuacionId = id;
+  const est = TIPO_STYLE[a.tipo_actuacion] || {bg:'#F2EBE1',bc:'#C4A882',ic:'#5C3D1E',icon:'ti-notes'};
+  const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+  const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+
+  // Header
+  document.getElementById('ov-tipo-icon').innerHTML = getIcon(est.icon, est.ic, '22px');
+  document.getElementById('ov-tipo-icon').style.background = est.bg;
+  document.getElementById('ov-tipo-icon').style.border = `1px solid ${est.bc}`;
+  document.getElementById('ov-titulo').textContent = a.descripcion?.slice(0,80) || a.tipo_actuacion;
+  document.getElementById('ov-subtitulo').textContent = `${a.tipo_actuacion} · ${fecha}`;
+
+  // Botones footer
+  document.getElementById('ov-btn-edit').onclick = () => { cerrarOverview(); editarActuacion(id); };
+  document.getElementById('ov-btn-del').onclick = (e) => { borrarActuacion(id, e); };
+
+  // Body
+  let html = '';
+
+  // Foto / adjunto
+  if (a.url_adjunto) {
+    const esImagen = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(a.url_adjunto);
+    if (esImagen) {
+      html += `<div class="ov-foto"><img src="${a.url_adjunto}" alt="Foto adjunta" onerror="this.parentElement.innerHTML='<div style=\'padding:16px;text-align:center;color:#7A7260;font-size:12px\'>No se pudo cargar la imagen</div>'"></div>`;
+    } else {
+      html += `<div class="ov-foto-link" onclick="window.open('${a.url_adjunto}','_blank')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>${a.url_adjunto.length > 50 ? a.url_adjunto.slice(0,47)+'…' : a.url_adjunto}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </div>`;
+    }
+  }
+
+  // Descripción
+  if (a.descripcion) {
+    html += `<div class="ov-desc">${a.descripcion}</div>`;
+  }
+
+  // Info general
+  html += `<div class="ov-section"><div class="ov-section-title">Información</div>`;
+  html += `<div class="ov-row"><span class="ov-label">Fecha</span><span class="ov-val">${fecha}</span></div>`;
+  if (parc) html += `<div class="ov-row"><span class="ov-label">Parcela</span><span class="ov-val">${parc.nombre_parcela} · ${parc.superficie_ha} ha</span></div>`;
+  html += `<div class="ov-row"><span class="ov-label">Tipo</span><span class="ov-val">${a.tipo_actuacion}</span></div>`;
+
+  // Personas y horas
+  const titular = CFG.titular || 'Titular';
+  let personasHTML = '';
+  if (a.horas_titular) personasHTML += `<div class="ov-row"><span class="ov-label">${titular}</span><span class="ov-val">${a.horas_titular} h (titular)</span></div>`;
+  if (a.operario) {
+    a.operario.split(',').forEach(op => {
+      if (op.trim()) personasHTML += `<div class="ov-row"><span class="ov-label">Operario</span><span class="ov-val">${op.trim()}</span></div>`;
+    });
+  }
+  if (!personasHTML) personasHTML = `<div class="ov-row"><span class="ov-label">Titular</span><span class="ov-val">${titular}</span></div>`;
+  html += personasHTML;
+
+  if (a.observaciones) html += `<div class="ov-row"><span class="ov-label">Notas</span><span class="ov-val">${a.observaciones}</span></div>`;
+  html += `</div>`;
+
+  // Fitosanitario
+  if (a.tipo_actuacion === 'Fitosanitario' && (a.fito_producto || a.fito_problema)) {
+    html += `<div class="ov-section"><div class="ov-section-title">Datos fitosanitarios</div><div class="ov-fito-grid">`;
+    if (a.fito_problema) html += `<div class="ov-fito-cell"><div class="lbl">Problema</div><div class="val">${a.fito_problema}</div></div>`;
+    if (a.fito_producto) html += `<div class="ov-fito-cell"><div class="lbl">Producto</div><div class="val">${a.fito_producto}</div></div>`;
+    if (a.fito_materia)  html += `<div class="ov-fito-cell"><div class="lbl">Mat. activa</div><div class="val">${a.fito_materia}</div></div>`;
+    if (a.fito_registro) html += `<div class="ov-fito-cell"><div class="lbl">Nº Registro</div><div class="val">${a.fito_registro}</div></div>`;
+    if (a.fito_dosis)    html += `<div class="ov-fito-cell"><div class="lbl">Dosis</div><div class="val">${a.fito_dosis}</div></div>`;
+    if (a.fito_sup_ha)   html += `<div class="ov-fito-cell"><div class="lbl">Sup. tratada</div><div class="val">${a.fito_sup_ha} ha</div></div>`;
+    if (a.fito_equipo)   html += `<div class="ov-fito-cell"><div class="lbl">Equipo</div><div class="val">${a.fito_equipo}</div></div>`;
+    html += `</div></div>`;
+  }
+
+  document.getElementById('ov-body').innerHTML = html;
+  document.getElementById('ov-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarOverview() {
+  document.getElementById('ov-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  ovActuacionId = null;
+}
+
+function ovClose(e) {
+  if (e.target === document.getElementById('ov-overlay')) cerrarOverview();
+}
+
+async function borrarActuacion(id, event) {
+  if (event) event.stopPropagation();
+  const a = ACTUACIONES.find(x=>x.actuacion_id===id);
+  if (!a) return;
+  const parc = PARCELAS.find(p=>p.parcela_id===a.parcela_id);
+  const desc = a.descripcion ? `"${a.descripcion.slice(0,50)}"` : a.tipo_actuacion;
+  const fecha = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
+  if (!confirm(`¿Eliminar esta actuación?\n\n${desc}\n${fecha}${parc?' · '+parc.nombre_parcela:''}\n\nEsta acción no se puede deshacer.`)) return;
+  cerrarOverview();
+  try {
+    await sbFetch(`actuaciones?actuacion_id=eq.${id}`, {method:'DELETE', prefer:'return=minimal'});
+    showToast('Actuación eliminada');
+    await cargarActuaciones();
+  } catch(e) { showToast('Error al eliminar', true); }
+}
+
 
 </script>
 </body>
