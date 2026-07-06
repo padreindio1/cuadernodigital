@@ -679,7 +679,11 @@ const SVG_ICONS = {
 function getIcon(name, color='currentColor', size='20px') {
   const svg = SVG_ICONS[name] || '';
   if (!svg) return '';
-  return svg.replace(/stroke="currentColor"/g, `stroke="${color}"`).replace(/width="[^"]*"/g, `width="${size}"`).replace(/height="[^"]*"/g, `height="${size}"`);
+  return svg
+    .replace(/stroke="currentColor"/g, `stroke="${color}"`)
+    .replace(/width="[^"]*"/g, `width="${size}"`)
+    .replace(/height="[^"]*"/g, `height="${size}"`)
+    .replace(/<(path|circle|rect|line|polyline|polygon|ellipse)(\s)/g, '<$1 fill="none" $2');
 }
 
 const TIPO_STYLE = {
