@@ -647,7 +647,43 @@ const db = {
 // ══════════════════════════════════════════════
 //  ESTADO
 // ══════════════════════════════════════════════
-let CFG = JSON.parse(localStorage.getItem('cfg') || '{"nombre":"","titular":"","campana":"2026","operarios":[]}');
+let CFG = {"nombre":"","titular":"","campana":"2026","operarios":[]};
+
+async function cargarCFG() {
+  try {
+    const rows = await sbFetch('config?select=key,value');
+    if (rows && rows.length) {
+      rows.forEach(r => {
+        try { CFG[r.key] = JSON.parse(r.value); }
+        catch { CFG[r.key] = r.value; }
+      });
+    }
+  } catch(e) { console.warn('No se pudo cargar config de Supabase', e); }
+}
+
+async function guardarCFGRemoto() {
+  const entries = Object.entries(CFG).map(([key, value]) => ({
+    key,
+    value: JSON.stringify(value)
+  }));
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/config`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal,resolution=merge-duplicates'
+      },
+      body: JSON.stringify(entries)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('Configuración guardada');
+  } catch(e) {
+    console.warn('No se pudo guardar config en Supabase', e);
+    showToast('Error al guardar configuración', true);
+  }
+}
 let PARCELAS = [], ACTUACIONES = [];
 let tipoSel = '', parcelaFiltro = '', editandoId = null;
 
@@ -711,6 +747,7 @@ function var_tierra_bd(){return '#D4B96A';}
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  await cargarCFG();
   aplicarCfg();
   await Promise.all([cargarParcelas(), cargarActuaciones()]);
   verificarConexion();
@@ -1098,19 +1135,20 @@ function renderCfgOps() {
   document.getElementById('op-sel').innerHTML = '<option value="">Añadir operario…</option>' +
     (CFG.operarios||[]).map(op=>`<option>${op}</option>`).join('');
 }
-function addCfgOp() {
+async function addCfgOp() {
   const input=document.getElementById('cfg-op-input'), name=input.value.trim();
   if (!name) return;
   CFG.operarios=[...(CFG.operarios||[]),name]; input.value=''; renderCfgOps();
+  await guardarCFGRemoto();
 }
-function quitarCfgOp(i) { CFG.operarios.splice(i,1); renderCfgOps(); }
-function guardarCfg() {
+async function quitarCfgOp(i) { CFG.operarios.splice(i,1); renderCfgOps(); await guardarCFGRemoto(); }
+async function guardarCfg() {
   CFG.nombre   = document.getElementById('cfg-nombre').value.trim();
   CFG.titular  = document.getElementById('cfg-titular').value.trim();
   CFG.nif      = document.getElementById('cfg-nif').value.trim();
   CFG.campana  = document.getElementById('cfg-campana').value.trim();
   CFG.telefono = document.getElementById('cfg-tel').value.trim();
-  localStorage.setItem('cfg', JSON.stringify(CFG));
+  await guardarCFGRemoto();
   aplicarCfg();
   showToast('Configuración guardada');
 }
