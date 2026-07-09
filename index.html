@@ -748,7 +748,7 @@ async function guardarCFGRemoto() {
     showToast('Error: ' + e.message.slice(0, 80), true);
   }
 }
-let PARCELAS = [], ACTUACIONES = [];
+let PARCELAS = [], ACTUACIONES = [], PRODUCCIONES = [];
 let tipoSel = '', parcelaFiltro = '', editandoId = null;
 
 const SVG_ICONS = {
@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
   await cargarCFG();
   aplicarCfg();
-  await Promise.all([cargarParcelas(), cargarActuaciones()]);
+  await Promise.all([cargarParcelas(), cargarActuaciones(), cargarProducciones()]);
   verificarConexion();
   cargarCfgForm();
 });
@@ -872,11 +872,42 @@ function actualizarStats() {
   document.getElementById('stat-ha').textContent   = PARCELAS.reduce((s,p)=>s+parseFloat(p.superficie_ha||0),0).toFixed(1);
 }
 
+async function cargarProducciones() {
+  try {
+    PRODUCCIONES = await sbFetch('producciones?select=*&order=campana.desc');
+  } catch(e) { console.warn('Error cargando producciones', e); }
+}
+
+async function guardarProduccion(parcela_id, produccion_id, datos) {
+  if (produccion_id) {
+    await sbFetch(`producciones?produccion_id=eq.${produccion_id}`, {method:'PATCH', body:JSON.stringify(datos)});
+  } else {
+    await sbFetch('producciones', {method:'POST', body:JSON.stringify({
+      produccion_id: crypto.randomUUID(),
+      parcela_id,
+      ...datos
+    })});
+  }
+  await cargarProducciones();
+}
+
+async function eliminarProduccion(produccion_id) {
+  if (!confirm('¿Eliminar este registro de producción?')) return;
+  await sbFetch(`producciones?produccion_id=eq.${produccion_id}`, {method:'DELETE', prefer:'return=minimal'});
+  await cargarProducciones();
+  // Refrescar el overview si sigue abierto
+  const overlay = document.getElementById('pov-overlay');
+  if (overlay && overlay.classList.contains('open')) {
+    const parcelaId = overlay.dataset.parcelaId;
+    if (parcelaId) abrirPoverview(parcelaId);
+  }
+}
+
 async function guardarParcela() {
   const nombre = document.getElementById('np-n').value.trim();
   const sup    = document.getElementById('np-s').value;
   if (!nombre||!sup) { showToast('Indica nombre y superficie', true); return; }
-  const pf = document.getElementById('pf');
+  const pf = document.getElementById('p-form');
   const editId = pf.dataset.editId;
   const payload = {
     nombre_parcela: nombre,
@@ -892,7 +923,7 @@ async function guardarParcela() {
       await db.updParcela('parcelas', editId, payload);
       showToast(`Parcela "${nombre}" actualizada`);
       delete pf.dataset.editId;
-      document.querySelector('#pf .btn-primary').textContent = 'Guardar parcela';
+      document.querySelector('#p-form .btn-primary').textContent = 'Guardar parcela';
     } else {
       await db.insert('parcelas', {...payload, parcela_id: crypto.randomUUID()});
       showToast(`Parcela "${nombre}" guardada`);
@@ -1584,19 +1615,8 @@ function abrirPoverview(parcelaId) {
     editarParcela(p.parcela_id);
   };
 
-  // Producción por campaña (actuaciones tipo Recolección con descripción de kg)
+  // Recolecciones (solo para el stat del header)
   const recolecciones = acts.filter(a => a.tipo_actuacion === 'Recolección');
-  // Agrupar por año de la fecha
-  const prodPorCamp = {};
-  recolecciones.forEach(a => {
-    if (!a.fecha) return;
-    const year = a.fecha.slice(0, 4);
-    if (!prodPorCamp[year]) prodPorCamp[year] = {acts: 0, desc: [], acts_data: []};
-    prodPorCamp[year].acts++;
-    prodPorCamp[year].acts_data.push(a);
-    if (a.descripcion) prodPorCamp[year].desc.push(a.descripcion);
-    if (a.observaciones) prodPorCamp[year].desc.push(a.observaciones);
-  });
 
   // Tipos más frecuentes
   const tipoCount = {};
@@ -1635,28 +1655,40 @@ function abrirPoverview(parcelaId) {
   html += `<div class="ov-row"><span class="ov-label">Última act.</span><span class="ov-val">${ultimaFecha}</span></div>`;
   html += `</div>`;
 
-  // Producción por campaña
-  const campañas = Object.keys(prodPorCamp).sort((a,b) => b.localeCompare(a));
-  if (campañas.length) {
-    html += `<div class="ov-section"><div class="ov-section-title">Recolecciones por campaña</div>`;
-    campañas.forEach(year => {
-      const datos = prodPorCamp[year];
-      const textos = datos.desc.join(' ');
-      // Sumar kg del campo numérico
-      const totalKg = datos.acts_data ? datos.acts_data.reduce((s,a) => s + (parseFloat(a.kg)||0), 0) : 0;
-      const kgStr = totalKg > 0 ? totalKg.toLocaleString('es-ES') + ' kg' : `${datos.acts} visita${datos.acts!==1?'s':''}`;
-      const rends = datos.acts_data.filter(a=>a.recol_rendimiento).map(a=>parseFloat(a.recol_rendimiento));
-      const rendStr = rends.length ? ` · ${(rends.reduce((s,r)=>s+r,0)/rends.length).toFixed(1)}% rto.` : '';
-      const litrosTotal = totalKg > 0 && rends.length ? ` · ${Math.round(totalKg * (rends.reduce((s,r)=>s+r,0)/rends.length) / 100).toLocaleString('es-ES')} L` : '';
-      html += `<div class="ov-row"><span class="ov-label">${year}</span><span class="ov-val" style="color:#4A7A25;font-weight:600">${kgStr}${rendStr}${litrosTotal}</span></div>`;
-    });
+  // Producción por campaña — desde tabla producciones
+  const prods = PRODUCCIONES.filter(pr => pr.parcela_id === parcelaId)
+    .sort((a,b) => (b.campana||'').localeCompare(a.campana||''));
 
-    html += `</div>`;
-  } else {
-    html += `<div class="ov-section"><div class="ov-section-title">Producción por campaña</div>
-      <div style="font-size:13px;color:#7A7260;padding:10px 0">Sin recolecciones registradas aún.</div>
+  html += `<div class="ov-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="ov-section-title" style="margin:0">Producción por campaña</div>
+      <button onclick="povAñadirProd('${parcelaId}')" style="font-size:11px;font-weight:700;color:#2D5016;background:#E8F0DC;border:1px solid #7BA05B;border-radius:6px;padding:4px 10px;cursor:pointer">+ Añadir</button>
     </div>`;
+
+  if (prods.length) {
+    const maxKg = Math.max(...prods.map(pr => parseFloat(pr.kg)||0), 1);
+    prods.forEach(pr => {
+      const kg = parseFloat(pr.kg)||0;
+      const pct = Math.round(kg / maxKg * 100);
+      const rend = pr.rendimiento ? parseFloat(pr.rendimiento) : null;
+      const litros = kg && rend ? Math.round(kg * rend / 100) : null;
+      html += \`<div style="padding:10px 0;border-bottom:.5px solid rgba(92,61,30,.08)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:700;color:#1C1A14;width:48px;flex-shrink:0">\${pr.campana}</span>
+          <span style="font-size:14px;font-weight:700;color:#2D5016;flex:1">\${kg > 0 ? kg.toLocaleString('es-ES')+' kg' : '—'}</span>
+          \${rend ? \`<span style="font-size:11px;color:#4A7A25;font-weight:600">\${rend.toFixed(1)}% · \${litros?.toLocaleString('es-ES')} L</span>\` : ''}
+          <button onclick="povEditarProd('\${pr.produccion_id}')" style="background:none;border:none;cursor:pointer;color:#7A7260;padding:2px 6px;font-size:14px" title="Editar">✎</button>
+          <button onclick="eliminarProduccion('\${pr.produccion_id}')" style="background:none;border:none;cursor:pointer;color:#D48080;padding:2px 6px;font-size:16px;line-height:1" title="Eliminar">×</button>
+        </div>
+        \${kg > 0 ? \`<div style="height:5px;background:#F5F0E8;border-radius:3px;overflow:hidden"><div style="height:100%;width:\${pct}%;background:#4A7A25;border-radius:3px"></div></div>\` : ''}
+        \${pr.destino ? \`<div style="font-size:11px;color:#7A7260;margin-top:4px">\${pr.destino}</div>\` : ''}
+        \${pr.observaciones ? \`<div style="font-size:11px;color:#7A7260;margin-top:2px">\${pr.observaciones}</div>\` : ''}
+      </div>\`;
+    });
+  } else {
+    html += \`<div style="font-size:13px;color:#7A7260;padding:8px 0">Sin datos de producción aún. Pulsa <strong>+ Añadir</strong> para registrar campañas anteriores.</div>\`;
   }
+  html += '</div>';
 
   // Actividad por tipo
   if (tiposOrdenados.length) {
@@ -1701,6 +1733,7 @@ function abrirPoverview(parcelaId) {
   }
 
   document.getElementById('pov-body').innerHTML = html;
+  document.getElementById('pov-overlay').dataset.parcelaId = parcelaId;
   document.getElementById('pov-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1717,19 +1750,121 @@ function povClose(e) {
 function editarParcela(parcelaId) {
   const p = PARCELAS.find(x => x.parcela_id === parcelaId);
   if (!p) return;
-  // Abrir el formulario de nueva parcela relleno con los datos
-  const pf = document.getElementById('pf');
-  if (pf.style.display === 'none' || !pf.style.display) togglePF();
+  cerrarPoverview();
+  showScreen('parcelas');
+  const pform = document.getElementById('p-form');
+  if (!pform.classList.contains('open')) togglePF();
   document.getElementById('np-n').value   = p.nombre_parcela || '';
   document.getElementById('np-s').value   = p.superficie_ha || '';
   document.getElementById('np-c').value   = p.cultivo || 'Olivar';
   document.getElementById('np-v').value   = p.variedad || '';
   document.getElementById('np-r').value   = p.secano_regadio || 'Secano';
   document.getElementById('np-sig').value = p.ref_sigpac || '';
-  // Marcar para editar en vez de insertar
-  pf.dataset.editId = parcelaId;
-  document.querySelector('#pf .btn-primary').textContent = 'Actualizar parcela';
-  showScreen('parcelas');
+  pform.dataset.editId = parcelaId;
+  document.querySelector('#p-form .btn-primary').textContent = 'Actualizar parcela';
+  pform.scrollIntoView({behavior:'smooth'});
+}
+
+
+// ══════════════════════════════════════════════
+//  PRODUCCIÓN POR CAMPAÑA
+// ══════════════════════════════════════════════
+function povAñadirProd(parcelaId) {
+  const añoActual = new Date().getFullYear();
+  const modal = document.createElement('div');
+  modal.id = 'prod-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,20,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px';
+  modal.innerHTML = `
+    <div style="background:#FFFEF9;border-radius:14px;padding:20px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(28,26,20,.2)">
+      <div style="font-size:15px;font-weight:700;color:#1C1A14;margin-bottom:16px">Añadir producción</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Campaña</label>
+          <input id="pm-camp" type="number" value="${añoActual}" min="2000" max="2099" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;font-weight:600;color:#1C1A14;background:#F5F0E8;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Kg recolectados</label>
+          <input id="pm-kg" type="number" placeholder="0" min="0" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Rendimiento (%)</label>
+          <input id="pm-rend" type="number" placeholder="Ej. 18.5" min="0" max="30" step="0.1" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Destino</label>
+          <input id="pm-dest" type="text" placeholder="Almazara…" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Observaciones</label>
+        <input id="pm-obs" type="text" placeholder="Notas opcionales…" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('prod-modal').remove()" style="flex:1;padding:12px;background:#F5F0E8;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:13px;font-weight:600;color:#7A7260;cursor:pointer">Cancelar</button>
+        <button onclick="povGuardarProdModal('${parcelaId}',null)" style="flex:2;padding:12px;background:#2D5016;border:none;border-radius:8px;font-size:13px;font-weight:700;color:#E8F0DC;cursor:pointer">Guardar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('pm-kg').focus();
+}
+
+function povEditarProd(produccionId) {
+  const pr = PRODUCCIONES.find(p => p.produccion_id === produccionId);
+  if (!pr) return;
+  const modal = document.createElement('div');
+  modal.id = 'prod-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,20,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px';
+  modal.innerHTML = `
+    <div style="background:#FFFEF9;border-radius:14px;padding:20px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(28,26,20,.2)">
+      <div style="font-size:15px;font-weight:700;color:#1C1A14;margin-bottom:16px">Editar producción ${pr.campana}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Campaña</label>
+          <input id="pm-camp" type="number" value="${pr.campana||''}" min="2000" max="2099" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;font-weight:600;color:#1C1A14;background:#F5F0E8;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Kg recolectados</label>
+          <input id="pm-kg" type="number" value="${pr.kg||''}" min="0" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Rendimiento (%)</label>
+          <input id="pm-rend" type="number" value="${pr.rendimiento||''}" min="0" max="30" step="0.1" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Destino</label>
+          <input id="pm-dest" type="text" value="${pr.destino||''}" placeholder="Almazara…" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Observaciones</label>
+        <input id="pm-obs" type="text" value="${pr.observaciones||''}" placeholder="Notas opcionales…" style="width:100%;padding:9px 10px;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:14px;color:#1C1A14;background:#FFFEF9;box-sizing:border-box">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('prod-modal').remove()" style="flex:1;padding:12px;background:#F5F0E8;border:1px solid rgba(92,61,30,.2);border-radius:8px;font-size:13px;font-weight:600;color:#7A7260;cursor:pointer">Cancelar</button>
+        <button onclick="povGuardarProdModal('${pr.parcela_id}','${pr.produccion_id}')" style="flex:2;padding:12px;background:#2D5016;border:none;border-radius:8px;font-size:13px;font-weight:700;color:#E8F0DC;cursor:pointer">Actualizar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+async function povGuardarProdModal(parcelaId, produccionId) {
+  const campana   = document.getElementById('pm-camp').value.trim();
+  const kg        = parseFloat(document.getElementById('pm-kg').value)||null;
+  const rendimiento = parseFloat(document.getElementById('pm-rend').value)||null;
+  const destino   = document.getElementById('pm-dest').value.trim()||null;
+  const observaciones = document.getElementById('pm-obs').value.trim()||null;
+  if (!campana) { alert('Indica la campaña'); return; }
+  try {
+    await guardarProduccion(parcelaId, produccionId, {campana, kg, rendimiento, destino, observaciones});
+    document.getElementById('prod-modal').remove();
+    abrirPoverview(parcelaId);
+  } catch(e) {
+    alert('Error al guardar: ' + e.message);
+  }
 }
 
 
