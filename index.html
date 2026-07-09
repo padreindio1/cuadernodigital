@@ -310,6 +310,23 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
 .ov-fito-cell{background:#F2F8EA;border:1px solid #C5DFA0;border-radius:8px;padding:10px 12px}
 .ov-fito-cell .lbl{font-size:10px;font-weight:700;color:#4A7A25;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
 .ov-fito-cell .val{font-size:13px;color:#1C1A14;font-weight:600}
+
+/* ── PARCELA OVERVIEW ── */
+.pov-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.pov-stat{background:#F5F0E8;border:1px solid rgba(92,61,30,.15);border-radius:8px;padding:10px 12px;text-align:center}
+.pov-stat .num{font-size:22px;font-weight:700;color:#2D5016;line-height:1}
+.pov-stat .lbl{font-size:10px;font-weight:700;color:#7A7260;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.pov-prod-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid rgba(92,61,30,.08)}
+.pov-prod-row:last-child{border-bottom:none}
+.pov-prod-camp{font-size:13px;font-weight:700;color:#1C1A14;width:52px;flex-shrink:0}
+.pov-prod-bar-wrap{flex:1;height:8px;background:#F5F0E8;border-radius:4px;overflow:hidden;border:1px solid rgba(92,61,30,.1)}
+.pov-prod-bar{height:100%;background:#4A7A25;border-radius:4px;transition:width .4s}
+.pov-prod-kg{font-size:12px;font-weight:700;color:#4A7A25;width:60px;text-align:right;flex-shrink:0}
+.pov-act-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:.5px solid rgba(92,61,30,.08);cursor:pointer}
+.pov-act-row:last-child{border-bottom:none}
+.pov-act-row:hover{background:#F5F0E8;margin:0 -4px;padding-left:4px;padding-right:4px;border-radius:6px}
+.pov-sigpac-btn{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:8px;cursor:pointer;text-decoration:none;margin-bottom:14px}
+.pov-sigpac-btn span{font-size:13px;font-weight:600;color:#185FA5;flex:1}
 </style>
 </head>
 <body>
@@ -588,6 +605,29 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
 </div>
 
 
+
+<!-- ══ PARCELA OVERVIEW ══ -->
+<div class="ov-overlay" id="pov-overlay" onclick="povClose(event)">
+  <div class="ov-drawer" id="pov-drawer">
+    <div class="ov-handle"></div>
+    <div class="ov-header">
+      <div class="ov-tipo-icon" style="background:#E8F0DC;border:1px solid #7BA05B">
+        <svg width="22px" height="22px" viewBox="0 0 24 24" fill="none" stroke="#2D5016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div class="ov-title">
+        <h3 id="pov-titulo"></h3>
+        <p id="pov-subtitulo"></p>
+      </div>
+      <button class="ov-close" onclick="cerrarPoverview()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="ov-body" id="pov-body"></div>
+    <div class="ov-footer">
+      <button class="ov-btn-edit" id="pov-btn-acts"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ver actuaciones</button>
+      <button class="ov-btn-edit" id="pov-btn-edit" style="background:#FFFEF9 !important;color:#2D5016 !important;border:1px solid rgba(45,80,22,.3) !important;flex:0;padding:13px 16px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ OVERVIEW MODAL ══ -->
 <div class="ov-overlay" id="ov-overlay" onclick="ovClose(event)">
   <div class="ov-drawer" id="ov-drawer">
@@ -677,11 +717,15 @@ async function guardarCFGRemoto() {
       },
       body: JSON.stringify(entries)
     });
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('Supabase config error:', res.status, errBody);
+      throw new Error(`${res.status}: ${errBody}`);
+    }
     showToast('Configuración guardada');
   } catch(e) {
-    console.warn('No se pudo guardar config en Supabase', e);
-    showToast('Error al guardar configuración', true);
+    console.error('guardarCFGRemoto falló:', e.message);
+    showToast('Error: ' + e.message.slice(0, 80), true);
   }
 }
 let PARCELAS = [], ACTUACIONES = [];
@@ -787,7 +831,7 @@ function renderParcelas() {
       ? `<span class="tag t-blue"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Regadío</span>`
       : `<span class="tag t-tierra"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Secano</span>`;
     const varTag = p.variedad ? `<span class="tag t-oliva"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.34"/><path d="M17 8c1 2.4.5 5-1 7-2 2.67-5 4-8 4-1 0-2-.17-3-.5"/><path d="M17 8c2-1.33 3.33-3 4-5-3 0-5.67 1.33-8 4"/></svg>${p.variedad}</span>` : '';
-    return `<div class="parcela-card" onclick="irAParcela('${p.parcela_id}','${p.nombre_parcela}','${p.cultivo}${p.variedad?' · '+p.variedad:''}${p.secano_regadio?' · '+p.secano_regadio:''}','${p.superficie_ha}')">
+    return `<div class="parcela-card" onclick="abrirPoverview('${p.parcela_id}')">
       <div class="pc-top"><div class="pc-icon"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 7H8z"/><path d="M10 10l4 7H6z"/><path d="M8 17l4 7H4z"/><line x1="12" y1="3" x2="12" y2="24"/></svg></div><div style="flex:1;min-width:0"><div class="pc-name">${p.nombre_parcela}</div><div class="pc-sub">${p.ref_sigpac||'Sin ref. SIGPAC'}</div></div><div class="pc-sup">${p.superficie_ha} <span>ha</span></div></div>
       <div class="pc-tags"><span class="tag t-oliva"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10M12 9v12M12 9C12 9 8 7 6 3c3 0 5.5 1.5 6 6zM12 9c0 0 4-2 6-6-3 0-5.5 1.5-6 6z"/></svg>${p.cultivo}</span>${varTag}${regTag}</div>
       <div class="pc-footer"><span class="pc-acts"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 22l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"/></svg>${acts} actuación${acts!==1?'es':''}</span><span class="pc-link"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Ver actuaciones</span><button class="btn-icon" style="margin-left:auto;width:30px;height:30px;flex-shrink:0" onclick="eliminarParcela('${p.parcela_id}','${p.nombre_parcela}',event)" title="Eliminar parcela"><svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div>
@@ -812,8 +856,9 @@ async function guardarParcela() {
   const nombre = document.getElementById('np-n').value.trim();
   const sup    = document.getElementById('np-s').value;
   if (!nombre||!sup) { showToast('Indica nombre y superficie', true); return; }
+  const pf = document.getElementById('pf');
+  const editId = pf.dataset.editId;
   const payload = {
-    parcela_id:     crypto.randomUUID(),
     nombre_parcela: nombre,
     superficie_ha:  parseFloat(sup),
     cultivo:        document.getElementById('np-c').value||'Olivar',
@@ -823,8 +868,15 @@ async function guardarParcela() {
     activa:         true
   };
   try {
-    await db.insert('parcelas', payload);
-    showToast(`Parcela "${nombre}" guardada`);
+    if (editId) {
+      await db.updParcela('parcelas', editId, payload);
+      showToast(`Parcela "${nombre}" actualizada`);
+      delete pf.dataset.editId;
+      document.querySelector('#pf .btn-primary').textContent = 'Guardar parcela';
+    } else {
+      await db.insert('parcelas', {...payload, parcela_id: crypto.randomUUID()});
+      showToast(`Parcela "${nombre}" guardada`);
+    }
     ['np-n','np-s','np-v','np-sig'].forEach(id=>document.getElementById(id).value='');
     togglePF();
     await cargarParcelas();
@@ -1447,6 +1499,184 @@ async function borrarActuacion(id, event) {
     showToast('Actuación eliminada');
     await cargarActuaciones();
   } catch(e) { showToast('Error al eliminar', true); }
+}
+
+
+// ══════════════════════════════════════════════
+//  PARCELA OVERVIEW
+// ══════════════════════════════════════════════
+function abrirPoverview(parcelaId) {
+  const p = PARCELAS.find(x => x.parcela_id === parcelaId);
+  if (!p) return;
+
+  const acts = ACTUACIONES.filter(a => a.parcela_id === parcelaId);
+  const totalActs = acts.length;
+  const totalHa = parseFloat(p.superficie_ha || 0);
+
+  // Stats rápidas
+  const ultimaAct = acts.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''))[0];
+  const ultimaFecha = ultimaAct?.fecha
+    ? new Date(ultimaAct.fecha + 'T12:00:00').toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
+    : '—';
+
+  // Header
+  document.getElementById('pov-titulo').textContent = p.nombre_parcela;
+  document.getElementById('pov-subtitulo').textContent =
+    [p.cultivo, p.variedad, p.secano_regadio].filter(Boolean).join(' · ') +
+    ' · ' + totalHa + ' ha';
+
+  // Botones footer
+  document.getElementById('pov-btn-acts').onclick = () => {
+    cerrarPoverview();
+    irAParcela(p.parcela_id, p.nombre_parcela, '', p.superficie_ha);
+  };
+  document.getElementById('pov-btn-edit').onclick = () => {
+    cerrarPoverview();
+    editarParcela(p.parcela_id);
+  };
+
+  // Producción por campaña (actuaciones tipo Recolección con descripción de kg)
+  const recolecciones = acts.filter(a => a.tipo_actuacion === 'Recolección');
+  // Agrupar por año de la fecha
+  const prodPorCamp = {};
+  recolecciones.forEach(a => {
+    if (!a.fecha) return;
+    const year = a.fecha.slice(0, 4);
+    if (!prodPorCamp[year]) prodPorCamp[year] = {acts: 0, desc: []};
+    prodPorCamp[year].acts++;
+    if (a.descripcion) prodPorCamp[year].desc.push(a.descripcion);
+    if (a.observaciones) prodPorCamp[year].desc.push(a.observaciones);
+  });
+
+  // Tipos más frecuentes
+  const tipoCount = {};
+  acts.forEach(a => { tipoCount[a.tipo_actuacion] = (tipoCount[a.tipo_actuacion]||0) + 1; });
+  const tiposOrdenados = Object.entries(tipoCount).sort((a,b) => b[1]-a[1]).slice(0,4);
+
+  // Construir body
+  let html = '';
+
+  // Stats grid
+  html += `<div class="pov-stats">
+    <div class="pov-stat"><div class="num">${totalActs}</div><div class="lbl">Actuaciones</div></div>
+    <div class="pov-stat"><div class="num">${recolecciones.length}</div><div class="lbl">Recolecciones</div></div>
+    <div class="pov-stat"><div class="num">${totalHa}</div><div class="lbl">Hectáreas</div></div>
+  </div>`;
+
+  // Enlace SIGPAC
+  if (p.ref_sigpac) {
+    // Formato SIGPAC: PP-MMM-PPPPP-RRRRR-TTTTT-NNNNN
+    // URL del visor: https://sigpac.mapama.gob.es/fega/visor/
+    const sigpacUrl = `https://sigpac.mapama.gob.es/fega/visor/#lat=37.5&lng=-4.5&zoom=15&layer=SIGPAC&recinto=${encodeURIComponent(p.ref_sigpac)}`;
+    html += `<a class="pov-sigpac-btn" href="${sigpacUrl}" target="_blank" onclick="event.stopPropagation()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Ver en SIGPAC · ${p.ref_sigpac}</span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>`;
+  }
+
+  // Info de la parcela
+  html += `<div class="ov-section"><div class="ov-section-title">Datos de la parcela</div>`;
+  html += `<div class="ov-row"><span class="ov-label">Superficie</span><span class="ov-val">${totalHa} ha</span></div>`;
+  html += `<div class="ov-row"><span class="ov-label">Cultivo</span><span class="ov-val">${p.cultivo||'—'}</span></div>`;
+  if (p.variedad) html += `<div class="ov-row"><span class="ov-label">Variedad</span><span class="ov-val">${p.variedad}</span></div>`;
+  html += `<div class="ov-row"><span class="ov-label">Régimen</span><span class="ov-val">${p.secano_regadio||'—'}</span></div>`;
+  if (p.ref_sigpac) html += `<div class="ov-row"><span class="ov-label">Ref. SIGPAC</span><span class="ov-val">${p.ref_sigpac}</span></div>`;
+  html += `<div class="ov-row"><span class="ov-label">Última act.</span><span class="ov-val">${ultimaFecha}</span></div>`;
+  html += `</div>`;
+
+  // Producción por campaña
+  const campañas = Object.keys(prodPorCamp).sort((a,b) => b.localeCompare(a));
+  if (campañas.length) {
+    html += `<div class="ov-section"><div class="ov-section-title">Recolecciones por campaña</div>`;
+    campañas.forEach(year => {
+      const datos = prodPorCamp[year];
+      const textos = datos.desc.join(' ');
+      // Intentar extraer kg de la descripción con regex
+      const kgMatch = textos.match(/(\d[\d.,]*)\s*(kg|kilos|kilo)/i);
+      const kgStr = kgMatch ? parseFloat(kgMatch[1].replace(',','.')).toLocaleString('es-ES') + ' kg' : `${datos.acts} visita${datos.acts!==1?'s':''}`;
+      html += `<div class="ov-row"><span class="ov-label">${year}</span><span class="ov-val" style="color:#4A7A25;font-weight:600">${kgStr}</span></div>`;
+    });
+    html += `<div style="font-size:11px;color:#7A7260;margin-top:8px;font-style:italic">Anota los kg en la descripción de cada recolección para verlos aquí</div>`;
+    html += `</div>`;
+  } else {
+    html += `<div class="ov-section"><div class="ov-section-title">Producción por campaña</div>
+      <div style="font-size:13px;color:#7A7260;padding:10px 0">Sin recolecciones registradas aún.<br><span style="font-size:11px;font-style:italic">Anota los kg en la descripción de cada actuación de tipo Recolección.</span></div>
+    </div>`;
+  }
+
+  // Actividad por tipo
+  if (tiposOrdenados.length) {
+    const maxTipo = tiposOrdenados[0][1];
+    html += `<div class="ov-section"><div class="ov-section-title">Actividad por tipo</div>`;
+    tiposOrdenados.forEach(([tipo, n]) => {
+      const est = TIPO_STYLE[tipo] || {bg:'#F2EBE1', bc:'#C4A882', ic:'#5C3D1E', icon:'ti-notes'};
+      const pct = Math.round(n / maxTipo * 100);
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+        <div style="width:28px;height:28px;border-radius:6px;background:${est.bg};border:1px solid ${est.bc};display:flex;align-items:center;justify-content:center;flex-shrink:0">${getIcon(est.icon, est.ic, '14px')}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:12px;font-weight:600;color:#1C1A14">${tipo}</span>
+            <span style="font-size:12px;font-weight:700;color:#4A7A25">${n}</span>
+          </div>
+          <div style="height:5px;background:#F5F0E8;border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${est.ic};border-radius:3px"></div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Últimas actuaciones
+  const ultimas = [...acts].sort((a,b) => (b.fecha||'').localeCompare(a.fecha||'')).slice(0, 5);
+  if (ultimas.length) {
+    html += `<div class="ov-section"><div class="ov-section-title">Últimas actuaciones</div>`;
+    ultimas.forEach(a => {
+      const est = TIPO_STYLE[a.tipo_actuacion] || {bg:'#F2EBE1', bc:'#C4A882', ic:'#5C3D1E', icon:'ti-notes'};
+      const fechaStr = a.fecha ? new Date(a.fecha+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
+      html += `<div class="pov-act-row" onclick="cerrarPoverview();abrirOverview('${a.actuacion_id}')">
+        <div style="width:28px;height:28px;border-radius:6px;background:${est.bg};border:1px solid ${est.bc};display:flex;align-items:center;justify-content:center;flex-shrink:0">${getIcon(est.icon, est.ic, '13px')}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:#1C1A14;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.descripcion||a.tipo_actuacion}</div>
+          <div style="font-size:11px;color:#7A7260">${a.tipo_actuacion} · ${fechaStr}</div>
+        </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7A7260" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('pov-body').innerHTML = html;
+  document.getElementById('pov-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarPoverview() {
+  document.getElementById('pov-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function povClose(e) {
+  if (e.target === document.getElementById('pov-overlay')) cerrarPoverview();
+}
+
+function editarParcela(parcelaId) {
+  const p = PARCELAS.find(x => x.parcela_id === parcelaId);
+  if (!p) return;
+  // Abrir el formulario de nueva parcela relleno con los datos
+  const pf = document.getElementById('pf');
+  if (pf.style.display === 'none' || !pf.style.display) togglePF();
+  document.getElementById('np-n').value   = p.nombre_parcela || '';
+  document.getElementById('np-s').value   = p.superficie_ha || '';
+  document.getElementById('np-c').value   = p.cultivo || 'Olivar';
+  document.getElementById('np-v').value   = p.variedad || '';
+  document.getElementById('np-r').value   = p.secano_regadio || 'Secano';
+  document.getElementById('np-sig').value = p.ref_sigpac || '';
+  // Marcar para editar en vez de insertar
+  pf.dataset.editId = parcelaId;
+  document.querySelector('#pf .btn-primary').textContent = 'Actualizar parcela';
+  showScreen('parcelas');
 }
 
 
