@@ -1135,22 +1135,29 @@ function renderCfgOps() {
   document.getElementById('op-sel').innerHTML = '<option value="">Añadir operario…</option>' +
     (CFG.operarios||[]).map(op=>`<option>${op}</option>`).join('');
 }
-async function addCfgOp() {
-  const input=document.getElementById('cfg-op-input'), name=input.value.trim();
-  if (!name) return;
-  CFG.operarios=[...(CFG.operarios||[]),name]; input.value=''; renderCfgOps();
-  await guardarCFGRemoto();
-}
-async function quitarCfgOp(i) { CFG.operarios.splice(i,1); renderCfgOps(); await guardarCFGRemoto(); }
-async function guardarCfg() {
+function syncCfgForm() {
   CFG.nombre   = document.getElementById('cfg-nombre').value.trim();
   CFG.titular  = document.getElementById('cfg-titular').value.trim();
   CFG.nif      = document.getElementById('cfg-nif').value.trim();
   CFG.campana  = document.getElementById('cfg-campana').value.trim();
   CFG.telefono = document.getElementById('cfg-tel').value.trim();
+}
+async function addCfgOp() {
+  const input=document.getElementById('cfg-op-input'), name=input.value.trim();
+  if (!name) return;
+  syncCfgForm();
+  CFG.operarios=[...(CFG.operarios||[]),name]; input.value=''; renderCfgOps();
+  await guardarCFGRemoto();
+}
+async function quitarCfgOp(i) {
+  syncCfgForm();
+  CFG.operarios.splice(i,1); renderCfgOps();
+  await guardarCFGRemoto();
+}
+async function guardarCfg() {
+  syncCfgForm();
   await guardarCFGRemoto();
   aplicarCfg();
-  showToast('Configuración guardada');
 }
 async function verificarConexion() {
   const el=document.getElementById('cfg-db-estado');
