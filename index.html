@@ -411,6 +411,16 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
             </div>
           </div>
 
+          <!-- bloque recolección -->
+          <div class="fito" id="recol-block">
+            <div class="fito-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg><span>Datos de recolección</span></div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Precio (€/kg)</label><input type="number" id="recol-precio" placeholder="0.00" min="0" step="0.01"></div>
+            </div>
+          </div>
+
           <div class="personas-block">
             <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Personas en la actuación</span></div>
             <div class="titular-row">
@@ -573,6 +583,16 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Teléfono</label><input type="text" id="cfg-tel" placeholder="Opcional"></div>
             </div>
           </div>
+          <!-- bloque recolección -->
+          <div class="fito" id="recol-block">
+            <div class="fito-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg><span>Datos de recolección</span></div>
+            <div class="row3">
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Precio (€/kg)</label><input type="number" id="recol-precio" placeholder="0.00" min="0" step="0.01"></div>
+            </div>
+          </div>
+
           <div class="personas-block">
             <div class="block-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Operarios habituales</span></div>
             <div class="op-pill-wrap" id="cfg-op-pills"></div>
@@ -992,6 +1012,11 @@ async function guardarActuacion() {
     payload.fito_sup_ha   = parseFloat(document.getElementById('fito-sup').value)||null;
     payload.fito_equipo   = document.getElementById('fito-equipo').value.trim()||null;
   }
+  if (tipoBtn.dataset.tipo==='Recolección') {
+    payload.kg             = parseFloat(document.getElementById('recol-kg').value)||null;
+    payload.recol_destino  = document.getElementById('recol-destino').value.trim()||null;
+    payload.recol_precio   = parseFloat(document.getElementById('recol-precio').value)||null;
+  }
   try {
     if (editandoId) {
       await db.update('actuaciones', editandoId, payload);
@@ -1027,6 +1052,12 @@ function editarActuacion(id) {
     });
     document.getElementById('fito-sup').value = a.fito_sup_ha||'';
   }
+  if (a.tipo_actuacion==='Recolección') {
+    document.getElementById('recol-block').classList.add('show');
+    document.getElementById('recol-kg').value      = a.kg||'';
+    document.getElementById('recol-destino').value = a.recol_destino||'';
+    document.getElementById('recol-precio').value  = a.recol_precio||'';
+  }
   document.getElementById('edit-banner').classList.add('show');
   document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
   window.scrollTo(0,0);
@@ -1049,6 +1080,10 @@ function resetFormulario() {
   document.getElementById('op-lista').innerHTML = '';
   document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('sel'));
   document.getElementById('fito-block').classList.remove('show');
+  document.getElementById('recol-block').classList.remove('show');
+  document.getElementById('recol-kg').value = '';
+  document.getElementById('recol-destino').value = '';
+  document.getElementById('recol-precio').value = '';
 }
 
 // ══════════════════════════════════════════════
@@ -1136,6 +1171,7 @@ function selTipo(btn) {
   document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   document.getElementById('fito-block').classList.toggle('show', btn.dataset.tipo==='Fitosanitario');
+  document.getElementById('recol-block').classList.toggle('show', btn.dataset.tipo==='Recolección');
 }
 function adjTab(id, btn) {
   document.querySelectorAll('.adj-tab').forEach(t=>t.classList.remove('active'));
@@ -1457,6 +1493,16 @@ function abrirOverview(id) {
   if (a.observaciones) html += `<div class="ov-row"><span class="ov-label">Notas</span><span class="ov-val">${a.observaciones}</span></div>`;
   html += `</div>`;
 
+  // Recolección
+  if (a.tipo_actuacion === 'Recolección' && (a.kg || a.recol_destino)) {
+    html += `<div class="ov-section"><div class="ov-section-title">Datos de recolección</div><div class="ov-fito-grid">`;
+    if (a.kg)            html += `<div class="ov-fito-cell"><div class="lbl">Kg recolectados</div><div class="val">${parseFloat(a.kg).toLocaleString('es-ES')} kg</div></div>`;
+    if (a.recol_destino) html += `<div class="ov-fito-cell"><div class="lbl">Destino</div><div class="val">${a.recol_destino}</div></div>`;
+    if (a.recol_precio)  html += `<div class="ov-fito-cell"><div class="lbl">Precio</div><div class="val">${parseFloat(a.recol_precio).toFixed(2)} €/kg</div></div>`;
+    if (a.kg && a.recol_precio) html += `<div class="ov-fito-cell"><div class="lbl">Total</div><div class="val" style="color:#0F6E56;font-weight:700">${(parseFloat(a.kg)*parseFloat(a.recol_precio)).toLocaleString('es-ES',{minimumFractionDigits:2})} €</div></div>`;
+    html += `</div></div>`;
+  }
+
   // Fitosanitario
   if (a.tipo_actuacion === 'Fitosanitario' && (a.fito_producto || a.fito_problema)) {
     html += `<div class="ov-section"><div class="ov-section-title">Datos fitosanitarios</div><div class="ov-fito-grid">`;
@@ -1542,8 +1588,9 @@ function abrirPoverview(parcelaId) {
   recolecciones.forEach(a => {
     if (!a.fecha) return;
     const year = a.fecha.slice(0, 4);
-    if (!prodPorCamp[year]) prodPorCamp[year] = {acts: 0, desc: []};
+    if (!prodPorCamp[year]) prodPorCamp[year] = {acts: 0, desc: [], acts_data: []};
     prodPorCamp[year].acts++;
+    prodPorCamp[year].acts_data.push(a);
     if (a.descripcion) prodPorCamp[year].desc.push(a.descripcion);
     if (a.observaciones) prodPorCamp[year].desc.push(a.observaciones);
   });
@@ -1592,16 +1639,16 @@ function abrirPoverview(parcelaId) {
     campañas.forEach(year => {
       const datos = prodPorCamp[year];
       const textos = datos.desc.join(' ');
-      // Intentar extraer kg de la descripción con regex
-      const kgMatch = textos.match(/(\d[\d.,]*)\s*(kg|kilos|kilo)/i);
-      const kgStr = kgMatch ? parseFloat(kgMatch[1].replace(',','.')).toLocaleString('es-ES') + ' kg' : `${datos.acts} visita${datos.acts!==1?'s':''}`;
+      // Sumar kg del campo numérico
+      const totalKg = datos.acts_data ? datos.acts_data.reduce((s,a) => s + (parseFloat(a.kg)||0), 0) : 0;
+      const kgStr = totalKg > 0 ? totalKg.toLocaleString('es-ES') + ' kg' : `${datos.acts} visita${datos.acts!==1?'s':''}`;
       html += `<div class="ov-row"><span class="ov-label">${year}</span><span class="ov-val" style="color:#4A7A25;font-weight:600">${kgStr}</span></div>`;
     });
-    html += `<div style="font-size:11px;color:#7A7260;margin-top:8px;font-style:italic">Anota los kg en la descripción de cada recolección para verlos aquí</div>`;
+
     html += `</div>`;
   } else {
     html += `<div class="ov-section"><div class="ov-section-title">Producción por campaña</div>
-      <div style="font-size:13px;color:#7A7260;padding:10px 0">Sin recolecciones registradas aún.<br><span style="font-size:11px;font-style:italic">Anota los kg en la descripción de cada actuación de tipo Recolección.</span></div>
+      <div style="font-size:13px;color:#7A7260;padding:10px 0">Sin recolecciones registradas aún.</div>
     </div>`;
   }
 
