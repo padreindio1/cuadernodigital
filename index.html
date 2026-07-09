@@ -1810,10 +1810,13 @@ function povClose(e) {
 function editarParcela(parcelaId) {
   const p = PARCELAS.find(x => x.parcela_id === parcelaId);
   if (!p) return;
-  cerrarPoverview();
-  showScreen('parcelas');
+
+  // 1. Rellenar el formulario antes de tocar nada más
   const pform = document.getElementById('p-form');
-  if (!pform.classList.contains('open')) togglePF();
+  if (!pform.classList.contains('open')) {
+    pform.classList.add('open');
+    document.getElementById('p-add-toggle').style.display = 'none';
+  }
   document.getElementById('np-n').value   = p.nombre_parcela || '';
   document.getElementById('np-s').value   = p.superficie_ha || '';
   document.getElementById('np-c').value   = p.cultivo || 'Olivar';
@@ -1822,6 +1825,10 @@ function editarParcela(parcelaId) {
   document.getElementById('np-sig').value = p.ref_sigpac || '';
   pform.dataset.editId = parcelaId;
   document.querySelector('#p-form .btn-primary').textContent = 'Actualizar parcela';
+
+  // 2. Navegar y cerrar el overlay — ya tenemos los datos listos
+  cerrarPoverview();
+  showScreen('parcelas');
   pform.scrollIntoView({behavior:'smooth'});
 }
 
