@@ -417,7 +417,7 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
             <div class="row3">
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Precio (€/kg)</label><input type="number" id="recol-precio" placeholder="0.00" min="0" step="0.01"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
             </div>
           </div>
 
@@ -589,7 +589,7 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
             <div class="row3">
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Precio (€/kg)</label><input type="number" id="recol-precio" placeholder="0.00" min="0" step="0.01"></div>
+              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
             </div>
           </div>
 
@@ -1013,9 +1013,9 @@ async function guardarActuacion() {
     payload.fito_equipo   = document.getElementById('fito-equipo').value.trim()||null;
   }
   if (tipoBtn.dataset.tipo==='Recolección') {
-    payload.kg             = parseFloat(document.getElementById('recol-kg').value)||null;
-    payload.recol_destino  = document.getElementById('recol-destino').value.trim()||null;
-    payload.recol_precio   = parseFloat(document.getElementById('recol-precio').value)||null;
+    payload.kg                 = parseFloat(document.getElementById('recol-kg').value)||null;
+    payload.recol_destino      = document.getElementById('recol-destino').value.trim()||null;
+    payload.recol_rendimiento  = parseFloat(document.getElementById('recol-rendimiento').value)||null;
   }
   try {
     if (editandoId) {
@@ -1054,9 +1054,9 @@ function editarActuacion(id) {
   }
   if (a.tipo_actuacion==='Recolección') {
     document.getElementById('recol-block').classList.add('show');
-    document.getElementById('recol-kg').value      = a.kg||'';
-    document.getElementById('recol-destino').value = a.recol_destino||'';
-    document.getElementById('recol-precio').value  = a.recol_precio||'';
+    document.getElementById('recol-kg').value           = a.kg||'';
+    document.getElementById('recol-destino').value      = a.recol_destino||'';
+    document.getElementById('recol-rendimiento').value  = a.recol_rendimiento||'';
   }
   document.getElementById('edit-banner').classList.add('show');
   document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
@@ -1083,7 +1083,7 @@ function resetFormulario() {
   document.getElementById('recol-block').classList.remove('show');
   document.getElementById('recol-kg').value = '';
   document.getElementById('recol-destino').value = '';
-  document.getElementById('recol-precio').value = '';
+  document.getElementById('recol-rendimiento').value = '';
 }
 
 // ══════════════════════════════════════════════
@@ -1496,10 +1496,13 @@ function abrirOverview(id) {
   // Recolección
   if (a.tipo_actuacion === 'Recolección' && (a.kg || a.recol_destino)) {
     html += `<div class="ov-section"><div class="ov-section-title">Datos de recolección</div><div class="ov-fito-grid">`;
-    if (a.kg)            html += `<div class="ov-fito-cell"><div class="lbl">Kg recolectados</div><div class="val">${parseFloat(a.kg).toLocaleString('es-ES')} kg</div></div>`;
-    if (a.recol_destino) html += `<div class="ov-fito-cell"><div class="lbl">Destino</div><div class="val">${a.recol_destino}</div></div>`;
-    if (a.recol_precio)  html += `<div class="ov-fito-cell"><div class="lbl">Precio</div><div class="val">${parseFloat(a.recol_precio).toFixed(2)} €/kg</div></div>`;
-    if (a.kg && a.recol_precio) html += `<div class="ov-fito-cell"><div class="lbl">Total</div><div class="val" style="color:#0F6E56;font-weight:700">${(parseFloat(a.kg)*parseFloat(a.recol_precio)).toLocaleString('es-ES',{minimumFractionDigits:2})} €</div></div>`;
+    if (a.kg)                 html += `<div class="ov-fito-cell"><div class="lbl">Kg recolectados</div><div class="val">${parseFloat(a.kg).toLocaleString('es-ES')} kg</div></div>`;
+    if (a.recol_destino)      html += `<div class="ov-fito-cell"><div class="lbl">Destino</div><div class="val">${a.recol_destino}</div></div>`;
+    if (a.recol_rendimiento)  html += `<div class="ov-fito-cell"><div class="lbl">Rendimiento</div><div class="val">${parseFloat(a.recol_rendimiento).toFixed(1)} %</div></div>`;
+    if (a.kg && a.recol_rendimiento) {
+      const litros = (parseFloat(a.kg) * parseFloat(a.recol_rendimiento) / 100).toLocaleString('es-ES', {maximumFractionDigits:0});
+      html += `<div class="ov-fito-cell"><div class="lbl">Aceite estimado</div><div class="val" style="color:#0F6E56;font-weight:700">${litros} L</div></div>`;
+    }
     html += `</div></div>`;
   }
 
@@ -1642,7 +1645,10 @@ function abrirPoverview(parcelaId) {
       // Sumar kg del campo numérico
       const totalKg = datos.acts_data ? datos.acts_data.reduce((s,a) => s + (parseFloat(a.kg)||0), 0) : 0;
       const kgStr = totalKg > 0 ? totalKg.toLocaleString('es-ES') + ' kg' : `${datos.acts} visita${datos.acts!==1?'s':''}`;
-      html += `<div class="ov-row"><span class="ov-label">${year}</span><span class="ov-val" style="color:#4A7A25;font-weight:600">${kgStr}</span></div>`;
+      const rends = datos.acts_data.filter(a=>a.recol_rendimiento).map(a=>parseFloat(a.recol_rendimiento));
+      const rendStr = rends.length ? ` · ${(rends.reduce((s,r)=>s+r,0)/rends.length).toFixed(1)}% rto.` : '';
+      const litrosTotal = totalKg > 0 && rends.length ? ` · ${Math.round(totalKg * (rends.reduce((s,r)=>s+r,0)/rends.length) / 100).toLocaleString('es-ES')} L` : '';
+      html += `<div class="ov-row"><span class="ov-label">${year}</span><span class="ov-val" style="color:#4A7A25;font-weight:600">${kgStr}${rendStr}${litrosTotal}</span></div>`;
     });
 
     html += `</div>`;
