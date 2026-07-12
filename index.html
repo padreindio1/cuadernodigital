@@ -1098,6 +1098,16 @@ async function guardarActuacion() {
     tipo_actuacion: tipoBtn.dataset.tipo,
     operario:       [...document.querySelectorAll('#op-lista .op-name')].map(n=>n.textContent).join(', ')||null,
     horas_titular:  parseFloat(document.getElementById('titular-h').value)||null,
+    horas_operarios: (()=>{
+      const rows = document.querySelectorAll('#op-lista .op-row');
+      const obj = {};
+      rows.forEach(r => {
+        const name = r.querySelector('.op-name')?.textContent;
+        const h = parseFloat(r.querySelector('.h-input')?.value)||0;
+        if (name && h) obj[name] = h;
+      });
+      return Object.keys(obj).length ? JSON.stringify(obj) : null;
+    })(),
     observaciones:  document.getElementById('f-obs').value.trim()||null,
     url_adjunto:    document.getElementById('f-enlace').value.trim()||null,
     updated_at:     new Date().toISOString()
@@ -1170,6 +1180,16 @@ function editarActuacion(id) {
     document.getElementById('analisis-block').classList.add('show');
     document.getElementById('anal-tipo').value = a.anal_tipo||'';
     document.getElementById('anal-lab').value  = a.anal_lab||'';
+  }
+  // Reconstruir lista de operarios
+  const opLista = document.getElementById('op-lista');
+  opLista.innerHTML = '';
+  if (a.operario) {
+    const horasOps = a.horas_operarios ? JSON.parse(a.horas_operarios) : {};
+    a.operario.split(',').forEach(op => {
+      const nombre = op.trim();
+      if (nombre) opLista.appendChild(crearFilaOp(nombre, horasOps[nombre]||''));
+    });
   }
   document.getElementById('edit-banner').classList.add('show');
   document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
@@ -1303,12 +1323,16 @@ function adjTab(id, btn) {
   btn.classList.add('active');
   document.getElementById('ap-'+id).classList.add('active');
 }
+function crearFilaOp(name, h) {
+  const row = document.createElement('div');
+  row.className = 'op-row';
+  row.innerHTML = `<svg width="15px" height="15px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="op-name">${name}</span><div class="h-wrap"><svg width="13px" height="13px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><input type="number" class="h-input" value="${h||''}" placeholder="h." min="0" step="0.5"></div><button class="btn-icon" onclick="this.parentElement.remove()"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+  return row;
+}
 function addOp() {
   const sel=document.getElementById('op-sel'), h=document.getElementById('op-h').value, name=sel.value;
   if (!name) return;
-  const row=document.createElement('div'); row.className='op-row';
-  row.innerHTML=`<svg width="15px" height="15px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="op-name">${name}</span><div class="h-wrap"><svg width="13px" height="13px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><input type="number" class="h-input" value="${h||''}" placeholder="h." min="0" step="0.5"></div><button class="btn-icon" onclick="this.parentElement.remove()"><svg width="14px" height="14px" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
-  document.getElementById('op-lista').appendChild(row);
+  document.getElementById('op-lista').appendChild(crearFilaOp(name, h));
   sel.value=''; document.getElementById('op-h').value='';
 }
 function previewFile(input, prevId) {
@@ -1446,12 +1470,14 @@ function renderJornales() {
       opMap[titular].acts.push({...a, horasOp: hTitular});
     }
     if (a.operario) {
+      const horasOps = a.horas_operarios ? JSON.parse(a.horas_operarios) : {};
       a.operario.split(',').forEach(p => {
-        const nombre = p.trim().replace(/:\s*[\d.]+h?/i,'').trim();
+        const nombre = p.trim();
         if (!nombre) return;
+        const h = horasOps[nombre] || 1;
         if (!opMap[nombre]) opMap[nombre] = {horas:0, acts:[]};
-        opMap[nombre].horas += 1;
-        opMap[nombre].acts.push({...a, horasOp: 1});
+        opMap[nombre].horas += h;
+        opMap[nombre].acts.push({...a, horasOp: h});
       });
     }
   });
