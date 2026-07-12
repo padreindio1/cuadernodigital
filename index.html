@@ -176,6 +176,7 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
 .b-red{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd)}
 .b-teal{background:#E1F5EE;color:#0F6E56;border:1px solid #7FCBB5}
 .b-blue{background:#E6F1FB;color:#185FA5;border:1px solid #B5D4F4}
+.b-verde{background:#EDF5E8;color:#3A7A1E;border:1px solid #9AC87A}
 .b-indigo{background:#EEF0F8;color:#3A4A8A;border:1px solid #A0A8D0}
 .b-purple{background:#F3EEF8;color:#6A3A8A;border:1px solid #C0A0D4}
 .card-desc{font-size:13px;color:var(--ink2);margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
@@ -328,6 +329,8 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
 .pov-sigpac-btn{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:8px;cursor:pointer;text-decoration:none;margin-bottom:14px}
 .pov-sigpac-btn span{font-size:13px;font-weight:600;color:#185FA5;flex:1}
 
+.subtipo-block{display:none;background:#F5F0E8;border:1px solid rgba(92,61,30,.15);border-radius:8px;padding:12px 14px;margin-bottom:12px}.subtipo-block.show{display:block}.subtipo-block .row2,.subtipo-block .row3{gap:8px;margin-bottom:0}.subtipo-block select{font-size:13px;padding:8px 10px;border:1px solid rgba(92,61,30,.2);border-radius:6px;background:#FFFEF9;color:#1C1A14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-appearance:none;width:100%;cursor:pointer}
+
 /* ── GRÁFICAS ── */
 .chart-wrap{background:#F5F0E8;border:1px solid rgba(92,61,30,.12);border-radius:10px;padding:14px 16px;margin-bottom:14px}
 .chart-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7A7260;margin-bottom:12px}
@@ -406,6 +409,7 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
               <button class="tipo-btn" data-tipo="Incidencia"    onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Incidencia</span></button>
               <button class="tipo-btn" data-tipo="Observación"   onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>Observación</span></button>
               <button class="tipo-btn" data-tipo="Mantenimiento"  onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76"/></svg><span>Mantenimiento</span></button>
+              <button class="tipo-btn" data-tipo="Chupones"      onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="22" x2="12" y2="10"/><path d="M12 10C12 10 9 7 9 4a3 3 0 0 1 6 0c0 3-3 6-3 6"/><path d="M12 14C12 14 8 13 6 10"/><path d="M12 17C12 17 16 16 18 13"/></svg><span>Chupones</span></button>
               <button class="tipo-btn" data-tipo="Análisis"       onclick="selTipo(this)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M9 3v7.5L4 19a1 1 0 0 0 .9 1.5h14.2a1 1 0 0 0 .9-1.5L15 10.5V3"/><line x1="6.5" y1="13" x2="17.5" y2="13"/></svg><span>Análisis</span></button>
             </div>
             <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>Descripción</label><textarea id="f-desc" placeholder="Qué se hizo, cómo quedó…"></textarea></div>
@@ -426,13 +430,35 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
             </div>
           </div>
 
+          <!-- bloque abonado -->
+          <div class="subtipo-block" id="abonado-block">
+            <div class="row3">
+              <div class="field"><label>Vía</label><select id="ab-via"><option value="">— Vía —</option><option>Foliar</option><option>Suelo</option><option>Fertirrigación</option></select></div>
+              <div class="field"><label>Tipo</label><select id="ab-tipo"><option value="">— Tipo —</option><option>Orgánico</option><option>Mineral</option><option>Organo-mineral</option><option>Corrector</option></select></div>
+              <div class="field"><label>Nutriente principal</label><select id="ab-nutriente"><option value="">— Nutriente —</option><option>Nitrógeno (N)</option><option>Fósforo (P)</option><option>Potasio (K)</option><option>Calcio (Ca)</option><option>Magnesio (Mg)</option><option>Hierro (Fe)</option><option>Boro (B)</option><option>Complejo NPK</option></select></div>
+            </div>
+          </div>
+
           <!-- bloque recolección -->
           <div class="fito" id="recol-block">
             <div class="fito-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg><span>Datos de recolección</span></div>
+            <div class="row3" style="margin-bottom:8px">
+              <div class="field"><label>Método</label><select id="recol-metodo"><option value="">— Método —</option><option>Manual</option><option>Vibrador de tronco</option><option>Paraguas</option><option>Mixto</option></select></div>
+              <div class="field"><label>Estado del fruto</label><select id="recol-estado"><option value="">— Estado —</option><option>Envero</option><option>Negro</option><option>Mixto</option></select></div>
+              <div class="field"><label>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
+            </div>
             <div class="row3">
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
+              <div class="field"><label>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
+              <div class="field"><label>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+
+          <!-- bloque análisis -->
+          <div class="subtipo-block" id="analisis-block">
+            <div class="row2">
+              <div class="field"><label>Tipo de análisis</label><select id="anal-tipo"><option value="">— Tipo —</option><option>Suelo</option><option>Foliar</option><option>Agua</option><option>Fruto</option><option>Aceite</option></select></div>
+              <div class="field"><label>Laboratorio</label><input type="text" id="anal-lab" placeholder="Nombre del laboratorio…"></div>
             </div>
           </div>
 
@@ -515,6 +541,7 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
             <button class="chip" data-tipo="Incidencia" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidencia</button>
             <button class="chip" data-tipo="Observación" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Observación</button>
             <button class="chip" data-tipo="Mantenimiento" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76"/></svg>Mantenimiento</button>
+            <button class="chip" data-tipo="Chupones" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="22" x2="12" y2="10"/><path d="M12 10C12 10 9 7 9 4a3 3 0 0 1 6 0c0 3-3 6-3 6"/><path d="M12 14C12 14 8 13 6 10"/><path d="M12 17C12 17 16 16 18 13"/></svg>Chupones</button>
             <button class="chip" data-tipo="Análisis" onclick="selChip(this,false)"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M9 3v7.5L4 19a1 1 0 0 0 .9 1.5h14.2a1 1 0 0 0 .9-1.5L15 10.5V3"/><line x1="6.5" y1="13" x2="17.5" y2="13"/></svg>Análisis</button>
           </div>
           <div id="h-stats-tipo" style="margin-bottom:4px"></div>
@@ -607,13 +634,35 @@ body{background:#F5F0E8;color:#1C1A14;display:flex;flex-direction:column;align-i
               <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Teléfono</label><input type="text" id="cfg-tel" placeholder="Opcional"></div>
             </div>
           </div>
+          <!-- bloque abonado -->
+          <div class="subtipo-block" id="abonado-block">
+            <div class="row3">
+              <div class="field"><label>Vía</label><select id="ab-via"><option value="">— Vía —</option><option>Foliar</option><option>Suelo</option><option>Fertirrigación</option></select></div>
+              <div class="field"><label>Tipo</label><select id="ab-tipo"><option value="">— Tipo —</option><option>Orgánico</option><option>Mineral</option><option>Organo-mineral</option><option>Corrector</option></select></div>
+              <div class="field"><label>Nutriente principal</label><select id="ab-nutriente"><option value="">— Nutriente —</option><option>Nitrógeno (N)</option><option>Fósforo (P)</option><option>Potasio (K)</option><option>Calcio (Ca)</option><option>Magnesio (Mg)</option><option>Hierro (Fe)</option><option>Boro (B)</option><option>Complejo NPK</option></select></div>
+            </div>
+          </div>
+
           <!-- bloque recolección -->
           <div class="fito" id="recol-block">
             <div class="fito-head"><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10L12 3l5 7"/><path d="M3 10h18l-2 9H5z"/><line x1="12" y1="10" x2="12" y2="19"/><line x1="8" y1="13" x2="8" y2="19"/><line x1="16" y1="13" x2="16" y2="19"/></svg><span>Datos de recolección</span></div>
+            <div class="row3" style="margin-bottom:8px">
+              <div class="field"><label>Método</label><select id="recol-metodo"><option value="">— Método —</option><option>Manual</option><option>Vibrador de tronco</option><option>Paraguas</option><option>Mixto</option></select></div>
+              <div class="field"><label>Estado del fruto</label><select id="recol-estado"><option value="">— Estado —</option><option>Envero</option><option>Negro</option><option>Mixto</option></select></div>
+              <div class="field"><label>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
+            </div>
             <div class="row3">
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Destino</label><input type="text" id="recol-destino" placeholder="Almazara, cooperativa…"></div>
-              <div class="field"><label><svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
+              <div class="field"><label>Kg recolectados</label><input type="number" id="recol-kg" placeholder="0" min="0" step="1"></div>
+              <div class="field"><label>Rendimiento (%)</label><input type="number" id="recol-rendimiento" placeholder="Ej. 18.5" min="0" max="30" step="0.1"></div>
+              <div class="field"></div>
+            </div>
+          </div>
+
+          <!-- bloque análisis -->
+          <div class="subtipo-block" id="analisis-block">
+            <div class="row2">
+              <div class="field"><label>Tipo de análisis</label><select id="anal-tipo"><option value="">— Tipo —</option><option>Suelo</option><option>Foliar</option><option>Agua</option><option>Fruto</option><option>Aceite</option></select></div>
+              <div class="field"><label>Laboratorio</label><input type="text" id="anal-lab" placeholder="Nombre del laboratorio…"></div>
             </div>
           </div>
 
@@ -792,6 +841,8 @@ const SVG_ICONS = {
   'ti-alert-triangle': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
   // Observación — ojo
   'ti-eye': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8"/><circle cx="12" cy="12" r="3"/></svg>`,
+  // Chupones — brote cortado
+  'ti-chupones': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="22" x2="12" y2="10"/><path d="M12 10C12 10 9 7 9 4a3 3 0 0 1 6 0c0 3-3 6-3 6"/><path d="M12 14C12 14 8 13 6 10"/><path d="M12 17C12 17 16 16 18 13"/></svg>`,
   // Mantenimiento — llave inglesa
   'ti-wrench': `<svg width="20px" height="20px" style="display:inline-block;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76"/></svg>`,
   // Análisis — matraz / laboratorio
@@ -819,13 +870,14 @@ const TIPO_STYLE = {
   'Recolección':   {bg:'#E6F1FB',       bc:'#B5D4F4',       ic:'#185FA5', icon:'ti-basket'},
   'Incidencia':    {bg:'#FCEAEA',       bc:'#D48080',       ic:'#8B2020', icon:'ti-alert-triangle'},
   'Observación':   {bg:'#F2EBE1',       bc:'#C4A882',       ic:'#5C3D1E', icon:'ti-eye'},
+  'Chupones':      {bg:'#EDF5E8',       bc:'#9AC87A',       ic:'#3A7A1E', icon:'ti-chupones'},
   'Mantenimiento': {bg:'#EEF0F8',       bc:'#A0A8D0',       ic:'#3A4A8A', icon:'ti-wrench'},
   'Análisis':      {bg:'#F3EEF8',       bc:'#C0A0D4',       ic:'#6A3A8A', icon:'ti-flask'},
 };
 const TIPO_BADGE = {
   'Poda':'b-tierra','Desbroce':'b-gray','Laboreo':'b-gray','Abonado':'b-teal',
   'Fitosanitario':'b-oliva','Recolección':'b-blue','Incidencia':'b-red','Observación':'b-gray',
-  'Mantenimiento':'b-indigo','Análisis':'b-purple'
+  'Chupones':'b-verde','Mantenimiento':'b-indigo','Análisis':'b-purple'
 };
 function var_tierra_lt(){return '#F0E6CC';}
 function var_tierra_bd(){return '#D4B96A';}
@@ -1110,9 +1162,22 @@ function editarActuacion(id) {
   }
   if (a.tipo_actuacion==='Recolección') {
     document.getElementById('recol-block').classList.add('show');
-    document.getElementById('recol-kg').value           = a.kg||'';
-    document.getElementById('recol-destino').value      = a.recol_destino||'';
-    document.getElementById('recol-rendimiento').value  = a.recol_rendimiento||'';
+    document.getElementById('recol-kg').value          = a.kg||'';
+    document.getElementById('recol-destino').value     = a.recol_destino||'';
+    document.getElementById('recol-rendimiento').value = a.recol_rendimiento||'';
+    document.getElementById('recol-metodo').value      = a.recol_metodo||'';
+    document.getElementById('recol-estado').value      = a.recol_estado||'';
+  }
+  if (a.tipo_actuacion==='Abonado') {
+    document.getElementById('abonado-block').classList.add('show');
+    document.getElementById('ab-via').value       = a.ab_via||'';
+    document.getElementById('ab-tipo').value      = a.ab_tipo||'';
+    document.getElementById('ab-nutriente').value = a.ab_nutriente||'';
+  }
+  if (a.tipo_actuacion==='Análisis') {
+    document.getElementById('analisis-block').classList.add('show');
+    document.getElementById('anal-tipo').value = a.anal_tipo||'';
+    document.getElementById('anal-lab').value  = a.anal_lab||'';
   }
   document.getElementById('edit-banner').classList.add('show');
   document.getElementById('btn-guardar').innerHTML = '<svg width="1em" height="1em" style="display:inline-block;vertical-align:middle;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 9 7 9"/><rect x="8" y="14" width="8" height="6"/></svg>Guardar cambios';
@@ -1140,6 +1205,15 @@ function resetFormulario() {
   document.getElementById('recol-kg').value = '';
   document.getElementById('recol-destino').value = '';
   document.getElementById('recol-rendimiento').value = '';
+  document.getElementById('recol-metodo').value = '';
+  document.getElementById('recol-estado').value = '';
+  document.getElementById('abonado-block').classList.remove('show');
+  document.getElementById('analisis-block').classList.remove('show');
+  document.getElementById('ab-via').value = '';
+  document.getElementById('ab-tipo').value = '';
+  document.getElementById('ab-nutriente').value = '';
+  document.getElementById('anal-tipo').value = '';
+  document.getElementById('anal-lab').value = '';
 }
 
 // ══════════════════════════════════════════════
@@ -1228,6 +1302,8 @@ function selTipo(btn) {
   btn.classList.add('sel');
   document.getElementById('fito-block').classList.toggle('show', btn.dataset.tipo==='Fitosanitario');
   document.getElementById('recol-block').classList.toggle('show', btn.dataset.tipo==='Recolección');
+  document.getElementById('abonado-block').classList.toggle('show', btn.dataset.tipo==='Abonado');
+  document.getElementById('analisis-block').classList.toggle('show', btn.dataset.tipo==='Análisis');
 }
 function adjTab(id, btn) {
   document.querySelectorAll('.adj-tab').forEach(t=>t.classList.remove('active'));
@@ -1408,8 +1484,8 @@ function renderJornales() {
     return;
   }
 
-  const TIPO_COL = {Poda:'#F0E6CC',Desbroce:'#F2EBE1',Laboreo:'#F2EBE1',Abonado:'#E1F5EE',Fitosanitario:'#E8F0DC',Recolección:'#E6F1FB',Incidencia:'#FCEAEA',Observación:'#F2EBE1',Mantenimiento:'#EEF0F8',Análisis:'#F3EEF8'};
-  const TIPO_TXT = {Poda:'#5C3D1E',Desbroce:'#5C3D1E',Laboreo:'#5C3D1E',Abonado:'#0F6E56',Fitosanitario:'#2D5016',Recolección:'#185FA5',Incidencia:'#8B2020',Observación:'#5C3D1E',Mantenimiento:'#3A4A8A',Análisis:'#6A3A8A'};
+  const TIPO_COL = {Poda:'#F0E6CC',Desbroce:'#F2EBE1',Laboreo:'#F2EBE1',Abonado:'#E1F5EE',Fitosanitario:'#E8F0DC',Recolección:'#E6F1FB',Incidencia:'#FCEAEA',Observación:'#F2EBE1',Mantenimiento:'#EEF0F8',Análisis:'#F3EEF8',Chupones:'#EDF5E8'};
+  const TIPO_TXT = {Poda:'#5C3D1E',Desbroce:'#5C3D1E',Laboreo:'#5C3D1E',Abonado:'#0F6E56',Fitosanitario:'#2D5016',Recolección:'#185FA5',Incidencia:'#8B2020',Observación:'#5C3D1E',Mantenimiento:'#3A4A8A',Análisis:'#6A3A8A',Chupones:'#3A7A1E'};
 
   renderChartJornales(acts);
   document.getElementById('j-op-lista').innerHTML = ops.map(([nombre, data]) => {
@@ -1557,9 +1633,28 @@ function abrirOverview(id) {
   if (a.observaciones) html += `<div class="ov-row"><span class="ov-label">Notas</span><span class="ov-val">${a.observaciones}</span></div>`;
   html += `</div>`;
 
+  // Abonado
+  if (a.tipo_actuacion === 'Abonado' && (a.ab_via || a.ab_tipo)) {
+    html += '<div class="ov-section"><div class="ov-section-title">Datos de abonado</div><div class="ov-fito-grid">';
+    if (a.ab_via)       html += '<div class="ov-fito-cell"><div class="lbl">Vía</div><div class="val">'+a.ab_via+'</div></div>';
+    if (a.ab_tipo)      html += '<div class="ov-fito-cell"><div class="lbl">Tipo</div><div class="val">'+a.ab_tipo+'</div></div>';
+    if (a.ab_nutriente) html += '<div class="ov-fito-cell"><div class="lbl">Nutriente</div><div class="val">'+a.ab_nutriente+'</div></div>';
+    html += '</div></div>';
+  }
+
+  // Análisis
+  if (a.tipo_actuacion === 'Análisis' && a.anal_tipo) {
+    html += '<div class="ov-section"><div class="ov-section-title">Datos de análisis</div><div class="ov-fito-grid">';
+    if (a.anal_tipo) html += '<div class="ov-fito-cell"><div class="lbl">Tipo</div><div class="val">'+a.anal_tipo+'</div></div>';
+    if (a.anal_lab)  html += '<div class="ov-fito-cell"><div class="lbl">Laboratorio</div><div class="val">'+a.anal_lab+'</div></div>';
+    html += '</div></div>';
+  }
+
   // Recolección
   if (a.tipo_actuacion === 'Recolección' && (a.kg || a.recol_destino)) {
     html += `<div class="ov-section"><div class="ov-section-title">Datos de recolección</div><div class="ov-fito-grid">`;
+    if (a.recol_metodo)       html += `<div class="ov-fito-cell"><div class="lbl">Método</div><div class="val">${a.recol_metodo}</div></div>`;
+    if (a.recol_estado)       html += `<div class="ov-fito-cell"><div class="lbl">Estado fruto</div><div class="val">${a.recol_estado}</div></div>`;
     if (a.kg)                 html += `<div class="ov-fito-cell"><div class="lbl">Kg recolectados</div><div class="val">${parseFloat(a.kg).toLocaleString('es-ES')} kg</div></div>`;
     if (a.recol_destino)      html += `<div class="ov-fito-cell"><div class="lbl">Destino</div><div class="val">${a.recol_destino}</div></div>`;
     if (a.recol_rendimiento)  html += `<div class="ov-fito-cell"><div class="lbl">Rendimiento</div><div class="val">${parseFloat(a.recol_rendimiento).toFixed(1)} %</div></div>`;
