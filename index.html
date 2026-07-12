@@ -1639,10 +1639,14 @@ function abrirOverview(id) {
   // Personas y horas
   const titular = CFG.titular || 'Titular';
   let personasHTML = '';
-  if (a.horas_titular) personasHTML += `<div class="ov-row"><span class="ov-label">${titular}</span><span class="ov-val">${a.horas_titular} h (titular)</span></div>`;
+  if (a.horas_titular) personasHTML += `<div class="ov-row"><span class="ov-label">Titular</span><span class="ov-val">${titular} · ${a.horas_titular} h</span></div>`;
   if (a.operario) {
+    const horasOps = a.horas_operarios ? JSON.parse(a.horas_operarios) : {};
     a.operario.split(',').forEach(op => {
-      if (op.trim()) personasHTML += `<div class="ov-row"><span class="ov-label">Operario</span><span class="ov-val">${op.trim()}</span></div>`;
+      const nombre = op.trim();
+      if (!nombre) return;
+      const h = horasOps[nombre];
+      personasHTML += `<div class="ov-row"><span class="ov-label">Operario</span><span class="ov-val">${nombre}${h ? ' · '+h+' h' : ''}</span></div>`;
     });
   }
   if (!personasHTML) personasHTML = `<div class="ov-row"><span class="ov-label">Titular</span><span class="ov-val">${titular}</span></div>`;
